@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./partials/head.ejs') %>
+<%- include('./partials/nav.ejs') %>
+<style>
+  a {
+    display: block;
+  }
+</style>
+<body>
+  <div>
+    <h1> <%= title %> </h1>
+    <% const bang = 'yoooo' %>
+    Hello  <%= bang  %>
+  </div>
+  <div> 
+    <a href="./test-transcript"> test-1-transcript</a>
+    <a href="./find-transcript"> find-1-transcript</a>
+    <a href="./null-transcript"> null-transcript</a>
+    <a href="./transcript/123123"> transcript/123123</a>
+    <hr>
+    <a href="./404.html"> 404</a>
+    <a href="./add-blog"> add blog</a>
+    <a href="./all-blogs"> all blogs</a>
+    <a href="./id-blog"> id blogs</a>
+    <a href="./blogs"> blogs rendered</a>
+    <a href="./blogs/create"> blogs create</a>
+  </div>
+</body>
+</html>

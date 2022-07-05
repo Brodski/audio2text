@@ -24,79 +24,88 @@ function handleIdResponse(data) {
 }   
 
 router.get('/transcript/:id', (req, res) => {
-    const id = req.params.id
+    const id = req.params.id;
     const aiUrl = "https://api.assemblyai.com/v2/transcript/" + id;
-    Transcript.find({"id": id}).then( result =>  {
-        console.log(result)
-        if (result && result > 0) {
-            console.log("RESULT NOT NULL")
+    Transcript.findOne({"id": id}).then( result =>  {
+        console.log(result?.id)
+        console.log(result?._id)
+        if (result != null) {
+            console.log("RESULT found in DB :)")   
+            console.log(result)   
+            res.statusCode = 200
+            res.send(result)
+            return
         }
-        else {
-            console.log("RESULT NOT FOUND IN DB")
-            const options = { 
-              headers: {
-                Authorization: process.env.ASSEMBLYAI_API_KEY
-              }
-            }
-            // let request = https.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', options, (response) => {
-            let request = https.get(aiUrl, options, (response) => {
-                console.log('statusCode:', response.statusCode);
-                // console.log('headers:', response.headers);
-                let data = ''
-                response.on('data', function (chunk) {
-                    console.log("chunk")
-                    console.log(chunk)
-                    data += chunk;
-                });
-            
-                response.on('end', function () {
-                    data = JSON.parse(data)
-                    let d = delete data.words
-                    console.log("data");
-                    console.log(data)
-                    console.log('deleted?', d);
-                    if (response.statusCode >= 200 && response.statusCode < 300 && data.status == "completed") {
-                        console.log("trying to save....")
-                        const transcript = new Transcript(data);
-                        transcript.save().then( (result) => {
-                            res.send(result)
-                            console.log("save success!.")
-                        })
-                        .catch( err => {
-                            console.log("(My error) Error occured", err)
-                            res.statusCode = 500
-                            res.json({
-                                error: "Saving data :(",
-                                data: data
-                            })
-                        })
-                    } 
-                    else if (response.statusCode >= 400 || response.statusCode < 500) {
-                        console.log("(400) bad request, status code: ", response.statusCode)
-                        res.statusCode = 400
-                        res.json({
-                            error: "Bad request :( ...Likely wrong ID ",
-                            data: data
-                        })
-                    }
-                    else if (response.statusCode > 500) {
-                        console.log("(500) Assembly AI server error, status code: ", response.statusCode)
+        console.log("RESULT NOT FOUND IN DB")
+        const options = { headers: {
+                Authorization: process.env.ASSEMBLYAI_API_KEY }
+        }
+        // let request = https.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', options, (response) => {
+        let request = https.get(aiUrl, options, (response) => {
+            console.log('statusCode:', response.statusCode);
+            // console.log('headers:', response.headers);
+            let data = ''
+            response.on('data', function (chunk) {
+                console.log("chunk")
+                console.log(chunk)
+                data += chunk;
+            });
+        
+            response.on('end', function () {
+                data = JSON.parse(data)
+                delete data.words
+                console.log("data");
+                console.log(data)
+                if (response.statusCode >= 200 && response.statusCode < 300 && data.status.toLowerCase() == "completed") {
+                    console.log("trying to save....")
+                    const transcript = new Transcript(data);
+                    transcript.save().then( (result) => {
+                        res.statusCode = 200
+                        res.send(result)
+                        console.log("save success!.")
+                    })
+                    .catch( err => {
+                        console.log("(My error) Error occured", err)
                         res.statusCode = 500
                         res.json({
-                            error: "Assembly AI broke :(",
+                            error: "Saving data :(",
                             data: data
                         })
-                    }
-                    // res.send(JSON.parse(data))
-                });
-            }).on('error', (e) => {
-                console.error(e);
-                res.statusCode = 404
-                res.json({error: "errorx"})
-                // res.end('{error: "error"}')
-                // res.end(JSON.stringify({error: "error"}))
+                    })
+                } 
+                else if (response.statusCode >= 200 && response.statusCode < 300 && data.status.toLowerCase() != "completed") {
+                    console.log("(409) conflict request. Transcription not complete, status code: ", response.statusCode)
+                    res.statusCode = 400
+                    res.json({
+                        error: "Bad request :( ...Likely wrong ID ",
+                        data: data
+                    })
+                }
+                else if (response.statusCode >= 400 || response.statusCode < 500) {
+                    console.log("(400) bad request, status code: ", response.statusCode)
+                    res.statusCode = 400
+                    res.json({
+                        error: "Bad request :( ...Likely wrong ID ",
+                        data: data
+                    })
+                }
+                else if (response.statusCode > 500) {
+                    console.log("(500) Assembly AI server error, status code: ", response.statusCode)
+                    res.statusCode = 500
+                    res.json({
+                        error: "Assembly AI broke :(",
+                        data: data
+                    })
+                }
+                // res.send(JSON.parse(data))
             });
-        }
+        }).on('error', (e) => {
+            console.error(e);
+            res.statusCode = 404
+            res.json({error: "errorx"})
+            // res.end('{error: "error"}')
+            // res.end(JSON.stringify({error: "error"}))
+        });
       // res.send(result)
     })
 

@@ -1,39 +1,68 @@
 
+
+
 const express = require('express');
 const { default: mongoose } = require('mongoose');
 const app = express()
-
+const cors = require("cors");
 const blogRoutes = require('./routes/blogRoutes');
 const transcriptRoutes = require('./routes/transcriptRoutes');
-let x = require("dotenv").config();
-console.log("xxxx")
-console.log(x)
+require("dotenv").config();
+
 
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_USERNAME;
 const dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/transcriptions?retryWrites=true&w=majority`
-mongoose.connect(dbUri)
-  .then((result) => {
-    app.listen(3000)
-  })
-  .catch( err => {
-    console.log('Error', err)
-  })
+// mongoose.connect(dbUri)
+//   .then((result) => {
+//     console.log("Connected to mongoose DB, gogoogogoo");
+//   })
+//   .catch( err => {
+//     console.log('Error', err)
+//   })
+  
+  app.listen(3000)
 
 app.set('view engine', 'ejs')
 app.set('views', './views') // this line not needed b/c views is by default
-// app.listen(3000)
 
 app.use(express.static(__dirname + '/public'))
 app.use(express.urlencoded({extended: true}))
 // app.use('/blogs', blogRoutes) // (adds blogs at the start) blog/blogs/create
+
+
+// var corsOptions = { origin: 'http://localhost:2000' }
+var corsOptions = { origin: '*' }
+
+// 
+app.use(cors(corsOptions))
 app.use(blogRoutes)
 app.use(transcriptRoutes)
 
-app.get('/', (req, res) => {
+
+app.options('*', cors(corsOptions));
+// app.post('/upload', cors(corsOptions), (req, res, next) => {
+app.post('/upload', (req, res, next) => {
+  console.log("got something");
+  console.log(req)
+  res.send("got it")
+})
+
+app.post('/upload2', (req, res, next) => {
+  // res.set('Access-Control-Allow-Origin', '*')
+  console.log("got something");
+  console.log(req)
+  res.send("got it")
+})
+
+
+
+
+app.get('/', async (req, res) => {
   // res.send("<p> home </p>") // auto figures out content-type 
   // res.sendFile('./views/index.html', {root: __dirname });
   res.render('index', {title : 'Cool Title'});
+
 })
 
 app.get('/about', (req, res) => {

@@ -1,27 +1,97 @@
 const express = require('express');
-const https = require('node:https');
+// const https = require('node:https');
+const https = require('https');
 const router = express.Router();
 const blogController = require("../controllers/blogController");
 const Transcript = require('../models/transcript');
-let x = require("dotenv").config();
-console.log("x")
-console.log(x)
-console.log(process.env.MY_VAR)
-console.log(process.env.NUMBER)
-console.log(process.env.ASSEMBLYAI_API_KEY)
+const cors = require("cors");
+const { appendFile } = require('node:fs');
+require("dotenv").config();
+const allVids = require("../models/allVids");
+const parseString = require('xml2js').parseString;
 
-// router.get('/all-blogs', blogController.blog_get_all)
-// router.get('/blogs/create', blogController.blog_create_get )
-// router.get('/blogs/:id', blogController.blog_details )
-// router.get('/blogs', blogController.blog_index)
-// router.post('/blogs', blogController.blog_create_post)
+// console.log(process.env.MY_VAR)
+// console.log(process.env.NUMBER)
+// console.log(process.env.ASSEMBLYAI_API_KEY)
 
 // https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences
 
-// router.get('/transcript/:id/sentence', (req, res) => {
-function handleIdResponse(data) {
 
-}   
+
+
+// router.get('/transcript/:id/sentence', (req, res) => {
+
+router.get("/allvids", (req, res) => {
+    console.log(allVids)
+     // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
+     let url = "https://d2h6hz1aakujaj.cloudfront.net"
+     let request = https.get(url, {headers: "application/xml"} , (response) => {
+         let data = ''
+         let i = 0
+         response.on('data', function (chunk) {
+             console.log("chunk ", i)
+             i++
+             data += chunk;
+         });
+     
+         response.on('end', function () {
+             console.log('statusCode:', response.statusCode);
+             if (response.statusCode >= 200 && response.statusCode < 300 ) {
+                 console.log("trying to save....")
+                 console.log("status", data?.status)
+                 parseString(data, function (err, result) {
+                    //  console.dir(result)
+                    //  console.log(" ListBucketResult", result.ListBucketResult);
+                    //  console.log(" ListBucketResult", result?.ListBucketResult );
+                    //  console.log(" ListBucketResult.Contents", result?.ListBucketResult?.Contents );
+                     console.log("xxxxxxxxxxxxxxxxxxxxxxxxxx111111111")
+                     let allVids = result?.ListBucketResult?.Contents?.filter( item => {
+                        return (item.Key[0].slice(-1) != "/")
+                     })
+                     allVids = allVids.map( item => {
+                        return item.Key[0];
+                     })
+                     console.log("xxxxxxxxxxxxxxxxxxxxxxxxxx")
+                     console.log(allVids)
+                     res.render("videos/all", {allVids})
+                 })
+             }
+             // res.send(JSON.parse(data))
+         }).on('error', (e) => {
+             console.error(e);
+             res.statusCode = 404
+             res.json({error: "Failed to get all vids :("})
+         });
+     });    
+})
+
+
+// var corsOptions = { origin: 'http://localhost:2000' }
+// router.post('/upload3', cors(corsOptions), (req, res) => {
+router.post('/upload3', (req, res) => {
+    // res.set('Access-Control-Allow-Origin', '*')
+    console.log("got something zzz");
+    console.log(req.headers)
+    console.log(req.body)
+    i =0;
+    let body = [];
+    req.on("error", err => {
+        console.error(err)
+    }).on('data', chunk => {
+        console.log(`Data chunk available ${i}`);
+        i ++
+        body.push(chunk)
+    })
+    // .on('end'), () => {
+    //     body = Buffer.concat(body).toString();
+    // });
+
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', "*");
+    res.send("got it")
+  })
+  
+
 
 router.get('/transcript/:id', (req, res) => {
     const id = req.params.id;
@@ -29,6 +99,7 @@ router.get('/transcript/:id', (req, res) => {
     Transcript.findOne({"id": id}).then( result =>  {
         console.log(result?.id)
         console.log(result?._id)
+        // Check if in my Database
         if (result != null) {
             console.log("RESULT found in DB :)")   
             console.log(result)   
@@ -36,77 +107,77 @@ router.get('/transcript/:id', (req, res) => {
             res.send(result)
             return
         }
-        console.log("RESULT NOT FOUND IN DB")
-        const options = { headers: {
-                Authorization: process.env.ASSEMBLYAI_API_KEY }
-        }
-        // let request = https.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', options, (response) => {
-        let request = https.get(aiUrl, options, (response) => {
-            console.log('statusCode:', response.statusCode);
-            // console.log('headers:', response.headers);
-            let data = ''
-            response.on('data', function (chunk) {
-                console.log("chunk")
-                console.log(chunk)
-                data += chunk;
-            });
-        
-            response.on('end', function () {
-                data = JSON.parse(data)
-                delete data.words
-                console.log("data");
-                console.log(data)
-                if (response.statusCode >= 200 && response.statusCode < 300 && data.status.toLowerCase() == "completed") {
-                    console.log("trying to save....")
-                    const transcript = new Transcript(data);
-                    transcript.save().then( (result) => {
-                        res.statusCode = 200
-                        res.send(result)
-                        console.log("save success!.")
-                    })
-                    .catch( err => {
-                        console.log("(My error) Error occured", err)
-                        res.statusCode = 500
+        // It's not in DB, need to get from AssemblyAI
+        else {
+            console.log("RESULT NOT FOUND IN DB")
+            const options = { headers: {
+                    Authorization: process.env.ASSEMBLYAI_API_KEY }
+            }
+            // let request = https.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', options, (response) => {
+            let request = https.get(aiUrl, options, (response) => {
+                console.log('statusCode:', response.statusCode);
+                let data = ''
+                response.on('data', function (chunk) {
+                    console.log("chunk")
+                    console.log(chunk)
+                    data += chunk;
+                });
+            
+                response.on('end', function () {
+                    data = JSON.parse(data)
+                    delete data.words
+                    console.log("data");
+                    console.log(data)
+                    if (response.statusCode >= 200 && response.statusCode < 300 && data.status.toLowerCase() == "completed") {
+                        console.log("trying to save....")
+                        const transcript = new Transcript(data);
+                        transcript.save().then( (result) => {
+                            res.statusCode = 200
+                            res.send(result)
+                            console.log("save success!.")
+                        })
+                        .catch( err => {
+                            console.log("(My error) Error occured", err)
+                            res.statusCode = 500
+                            res.json({
+                                error: "Saving data :(",
+                                data: data
+                            })
+                        })
+                    } 
+                    else if (response.statusCode >= 200 && response.statusCode < 300 && data.status.toLowerCase() != "completed") {
+                        console.log("(409) conflict request. Transcription not complete, status code: ", response.statusCode)
+                        res.statusCode = 400
                         res.json({
-                            error: "Saving data :(",
+                            error: "Bad request :( ...Likely wrong ID ",
                             data: data
                         })
-                    })
-                } 
-                else if (response.statusCode >= 200 && response.statusCode < 300 && data.status.toLowerCase() != "completed") {
-                    console.log("(409) conflict request. Transcription not complete, status code: ", response.statusCode)
-                    res.statusCode = 400
-                    res.json({
-                        error: "Bad request :( ...Likely wrong ID ",
-                        data: data
-                    })
-                }
-                else if (response.statusCode >= 400 || response.statusCode < 500) {
-                    console.log("(400) bad request, status code: ", response.statusCode)
-                    res.statusCode = 400
-                    res.json({
-                        error: "Bad request :( ...Likely wrong ID ",
-                        data: data
-                    })
-                }
-                else if (response.statusCode > 500) {
-                    console.log("(500) Assembly AI server error, status code: ", response.statusCode)
-                    res.statusCode = 500
-                    res.json({
-                        error: "Assembly AI broke :(",
-                        data: data
-                    })
-                }
-                // res.send(JSON.parse(data))
+                    }
+                    else if (response.statusCode >= 400 || response.statusCode < 500) {
+                        console.log("(400) bad request, status code: ", response.statusCode)
+                        res.statusCode = 400
+                        res.json({
+                            error: "Bad request :( ...Likely wrong ID ",
+                            data: data
+                        })
+                    }
+                    else if (response.statusCode > 500) {
+                        console.log("(500) Assembly AI server error, status code: ", response.statusCode)
+                        res.statusCode = 500
+                        res.json({
+                            error: "Assembly AI broke :(",
+                            data: data
+                        })
+                    }
+                    // res.send(JSON.parse(data))
+                });
+            }).on('error', (e) => {
+                console.error(e);
+                res.statusCode = 404
+                res.json({error: "errorx"})
             });
-        }).on('error', (e) => {
-            console.error(e);
-            res.statusCode = 404
-            res.json({error: "errorx"})
-            // res.end('{error: "error"}')
-            // res.end(JSON.stringify({error: "error"}))
-        });
-      // res.send(result)
+
+        }
     })
 
   // https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences

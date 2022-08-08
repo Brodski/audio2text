@@ -1,0 +1,20 @@
+
+<body> 
+<style>
+    a {
+        display: inline-flex;
+    }
+</style>
+
+
+<h2> All Vids </h2>
+    <% if (allVids && allVids.length > 0)  { %>
+        <% allVids.forEach( (vid, i) => {  %>
+            <div class="">
+                <h3> 
+                    <%=i%>: <a href="<%= process.env.CDN_DOMAIN %>/<%= vid %>" > <%=vid%>  </a>
+                </h3>
+            </div>
+        <% }) %>
+    <% } %>
+</body>

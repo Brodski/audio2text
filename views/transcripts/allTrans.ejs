@@ -1,0 +1,21 @@
+
+<%- include('../partials/head.ejs') %>
+<body> 
+    <style>
+        a {
+            display: inline-flex;
+        }
+    </style>
+
+
+    <h2> All Transcripts </h2>
+        <% if (allItems && allItems.length > 0)  { %>
+            <% allItems.forEach( (item, i) => {  %>
+                <div class="">
+                    <h3> 
+                        <%=i%>: <a href="/transcript/<%= item %>" > <%=item%>  </a>
+                    </h3>
+                </div>
+            <% }) %>
+        <% } %>
+</body>

@@ -13,13 +13,13 @@ require("dotenv").config();
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_USERNAME;
 const dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/transcriptions?retryWrites=true&w=majority`
-// mongoose.connect(dbUri)
-//   .then((result) => {
-//     console.log("Connected to mongoose DB, gogoogogoo");
-//   })
-//   .catch( err => {
-//     console.log('Error', err)
-//   })
+mongoose.connect(dbUri)
+  .then((result) => {
+    console.log("Connected to mongoose DB, gogoogogoo");
+  })
+  .catch( err => {
+    console.log('Error', err)
+  })
   
   app.listen(3000)
 
@@ -29,6 +29,7 @@ app.set('views', './views') // this line not needed b/c views is by default
 app.use(express.static(__dirname + '/public'))
 app.use(express.urlencoded({extended: true}))
 // app.use('/blogs', blogRoutes) // (adds blogs at the start) blog/blogs/create
+
 
 
 // var corsOptions = { origin: 'http://localhost:2000' }

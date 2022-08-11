@@ -1,0 +1,58 @@
+
+
+<%- include('../partials/head.ejs') %>
+
+<style>
+    input {
+        margin-top: 50px;
+        width: 350px;
+    }
+    .container {
+        /* display: grid;
+        place-items: center; */
+        margin-top: 50px;
+    }
+</style>
+
+<div class="container">
+    <div>
+        <div> /v2/transcript/{TRANSCRIPT-ID}/sentences </div>
+        <div> /v2/transcript/{TRANSCRIPT-ID}/paragraphs </div>
+        <div> https://cdn.assemblyai.com/upload/98859e5b-dac9-4696-92f6-ef91dd37b387 </div>
+        <label>Enter your shit:
+            <input name="endpoint" value="https://api.assemblyai.com/v2/transcript/">
+        </label>
+        <button onclick="gobabygo()"> Go!</button>
+    </div>
+</div>
+
+<script>
+    let input = document.querySelector("input[name='endpoint']")
+    let x = "<%= process.env.CDN_DOMAIN %>"
+    console.log(input)
+    console.log(x)
+    console.log(input.value)
+    function gobabygo() {
+        let input = document.querySelector("input[name='endpoint']")
+        let x = "<%= process.env.CDN_DOMAIN %>"
+        console.log(input)
+        console.log(input.value)
+        let headerz = {Authorization: "<%= process.env.ASSEMBLYAI_API_KEY %>"}
+        fetch(input.value, {headers: headerz})
+            .then(res => {
+                console.log(res)
+                return res
+            })
+            .then( data => {
+                console.log(data)
+                return data
+            })
+
+            // var blob = new Blob([response.value], { type: 'audio/mp3' });
+    }
+    // console.log("<%= process.env %>")
+    // console.log(JSON.stringify("<%= process.env %>", {depth: null}))
+    // console.log("bang? %j", "<%= process.env %>")
+    // console.dir("<%= process.env %>", {depth: null} )
+    // console.dir("<%= process.env %>")
+</script>

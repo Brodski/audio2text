@@ -141,11 +141,7 @@ router.get("/transcript/:id/paragraphs", async (req, res) => {
     
     let resMsg = await getItemFromDatabaseById(TranscriptParagraphs, aiUrl, id );
     res.statusCode = resMsg.statusCode;
-    console.log('-------------------------------------------')
-    console.log('-------------------------------------------')
-    console.log(resMsg.result)
     res.json(resMsg.result)
-    // res.render("transcripts/customGet")
 })
     
 router.get('/transcript/:id', async (req, res) => {
@@ -153,74 +149,7 @@ router.get('/transcript/:id', async (req, res) => {
     const aiUrl = "https://api.assemblyai.com/v2/transcript/" + id;
     let resMsg = await getItemFromDatabaseById(Transcript, aiUrl, id );
     res.statusCode = resMsg.statusCode;
-    console.log('-------------------------------------------')
-    console.log('-------------------------------------------')
-    console.log(resMsg.result)
     res.json(resMsg.result)
-    // Transcript.findOne({"id": id}).then( result =>  {
-    //     console.log(result?.id)
-    //     console.log(result?._id)
-    //     // Check if in my Database
-    //     if (result != null) {
-    //         console.log("RESULT found in DB :\n\n", result)
-    //         res.statusCode = 200
-    //         res.send(result)
-    //         return
-    //     }
-    //     // It's not in DB, need to get from AssemblyAI
-    //     else {
-    //         console.log("RESULT NOT FOUND IN DB")
-    //         const options = { headers: {
-    //                 Authorization: process.env.ASSEMBLYAI_API_KEY }
-    //         }
-    //         // let request = https.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', options, (response) => {
-    //         let request = https.get(aiUrl, options, (response) => {
-    //             console.log('statusCode:', response.statusCode);
-    //             let data = ''
-    //             response.on('data', function (chunk) {
-    //                 console.log("chunk")
-    //                 console.log(chunk)
-    //                 data += chunk;
-    //             });
-            
-    //             response.on('end', function () {
-    //                 data = JSON.parse(data)
-    //                 delete data.words
-    //                 console.log("data");
-    //                 console.log(data)
-    //                 if (response.statusCode >= 200 && response.statusCode < 300 && data.status.toLowerCase() == "completed") {
-    //                     const transcript = new Transcript(data);
-    //                     transcript.save().then( (result) => {
-    //                         console.log("save success!.")
-    //                         res.statusCode = 200
-    //                         res.send(result)
-    //                     })
-    //                     .catch( err => {
-    //                         console.log("(My error) Error occured", err)
-    //                         res.statusCode = 500
-    //                         res.json({
-    //                             error: "Saving data to mongo failed :(",
-    //                             data: data
-    //                         })
-    //                     })
-    //                 } 
-    //                 else {
-    //                     let {statusCode, errorMsg} = errorHandler(response, data)
-    //                     res.statusCode = statusCode;
-    //                     res.json({errorMsg, data});
-    //                 }
-    //             });
-    //         })
-    //         request.on('error', (e) => {
-    //             console.error(e);
-    //             res.statusCode = 404
-    //             res.json({error: "error making request to AssemblyAI"})
-    //         });
-
-    //     }
-    // })
-
-  // https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences
 })
 
 const errorHandler = (response, data) => {

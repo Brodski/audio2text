@@ -43,119 +43,122 @@ router.get("/allTranscriptsDb", async (req, res) => {
 
 })
 
-const getItemFromDatabaseById = async (CollectionName, aiUrl, id) => {
-    let resMsg = await CollectionName.findOne({"id": id}).then( result =>  {
+const getFromAssemblyAi = async (aiUrl) => {
+    return new Promise(function (resolve, reject) {
+
+        const options = { headers: { Authorization: process.env.ASSEMBLYAI_API_KEY } }
+        let request = https.get(aiUrl, options, (response) => {
+            console.log('statusCode:', response.statusCode);
+            let data = ''
+            response.on('data', function (chunk) {
+                console.log("chunk \n", chunk)
+                data += chunk;
+            });
+        
+            response.on('end', function () {
+                resMsg = {}
+                data = JSON.parse(data)
+                delete data.words
+                console.log("data?.status", data?.status);
+                console.log("response.statusCode ", response.statusCode );
+    
+                if (response.statusCode >= 200 && response.statusCode < 300 ) { // && data?.status?.toLowerCase() == "completed"
+                    resMsg = { statusCode: 200 }
+                    resMsg['data'] = data;
+                    resolve(resMsg);
+                } 
+                else {
+                    let {statusCode, errorMsg} = errorHandler(response)
+                    resMsg = { statusCode, errorMsg, }
+                    resMsg['data'] = data;
+                    reject(resMsg)
+                }
+            });
+        })
+        request.on('error', (e) => {
+            console.error(e);
+            resMsg = { statusCode: 404, errorMsg:  "error making request to AssemblyAI " + e }
+            resMsg['data'] = data;
+            reject(resMsg)
+        });
+    })
+}
+
+const getItemFromDatabaseById = async (CollectionName, id) => {
+    let result = await CollectionName.findOne({"id": id}).then( result =>  {
         console.log(result?.id)
         console.log(result?._id)
         // Check if in my Database
-        if (result != null) {
-            console.log("RESULT found in DB :\n\n", result)
-            return {
-                statusCode: 200, 
-                result
-            }
-        }
-        // It's not in DB, need to get from AssemblyAI
-        else {
-            console.log("RESULT NOT FOUND IN DB")
-            const options = { headers: { Authorization: process.env.ASSEMBLYAI_API_KEY } }
-            // let request = https.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', options, (response) => {
-            let request = https.get(aiUrl, options, (response) => {
-                console.log('statusCode:', response.statusCode);
-                let data = ''
-                response.on('data', function (chunk) {
-                    console.log("chunk")
-                    console.log(chunk)
-                    data += chunk;
-                });
-            
-                response.on('end', function () {
-                    resMsg = {}
-                    data = JSON.parse(data)
-                    delete data.words
-                    console.log("data");
-                    // console.log(data)
-                    console.log(data?.status)
-                    console.log(data?.status)
-
-                    if (response.statusCode >= 200 && response.statusCode < 300 ) { // && data?.status?.toLowerCase() == "completed"
-                        const transcript = new CollectionName(data);
-                        transcript.save().then( (result) => {
-                            console.log("save success!.")
-                            resMsg = {
-                                statusCode: 200, 
-                                data: result
-                            }
-                        })
-                        .catch( err => {
-                            console.log("(My error) Error occured", err)
-                            resMsg = {
-                                statusCode: 500, 
-                                errorMsg: "Saving data to mongo failed :( " + err, 
-                            }
-                        })
-                    } 
-                    else {
-                        let {statusCode, errorMsg} = errorHandler(response, data)
-                        resMsg = {
-                            statusCode,
-                            errorMsg,
-                        }
-                    }
-                    resMsg['data'] = data;
-                    return resMsg;
-                });
-            })
-            request.on('error', (e) => {
-                console.error(e);
-                return {
-                    statusCode: 404,
-                    errorMsg:  "error making request to AssemblyAI",
-                    data
-                }
-            });
-
-        }
+        return result;
     })
     console.log("did it wait???????????????")
     console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log(resMsg)
-    return resMsg
+    console.log(result)
+    return result
+}
+const saveToDb = (CollectionName) => {
+    const transcript = new CollectionName(data);
+    transcript.save().then( (result) => {
+        console.log("save success!.")
+        resMsg = {
+            statusCode: 200, 
+            data: result
+        }
+    })
+    .catch( err => {
+        console.log("(My error) Error occured", err)
+        resMsg = {
+            statusCode: 500, 
+            errorMsg: "Saving data to mongo failed :( " + err, 
+        }
+    })
 }
 
 router.get("/transcript/:id/paragraphs", async (req, res) => {
     const id = req.params.id;
     const aiUrl = "https://api.assemblyai.com/v2/transcript/" + id + "/paragraphs";
-    
-    let resMsg = await getItemFromDatabaseById(TranscriptParagraphs, aiUrl, id );
+    let resMsg = "";
+    // let resMsg = await getItemFromDatabaseById(TranscriptParagraphs, aiUrl, id );
+    if (resMsg == null || resMsg == "") { // It's not in DB, need to get from AssemblyAI
+        console.log("RESULT NOT FOUND IN DB")
+        
+        console.log("00000 resMsg")
+        console.log("00000 resMsg")
+        console.log("00000 resMsg")
+        console.log("00000 resMsg")
+        console.log("00000 resMsg")
+        console.log("00000 resMsg")
+        resMsg = await getFromAssemblyAi(aiUrl)
+
+        // if (resMsg.statusCode >= 200 && response.statusCode < 300 ) {
+        //     saveToDb(TranscriptParagraphs)
+        // }
+    }
+    console.log("XXX resMsg")
+    console.log("XXX resMsg")
+    console.log("XXX resMsg")
+    console.log("XXX resMsg")
+    console.log( resMsg)
     res.statusCode = resMsg.statusCode;
-    res.json(resMsg.result)
+    res.json(resMsg.data)
 })
     
 router.get('/transcript/:id', async (req, res) => {
     const id = req.params.id;
     const aiUrl = "https://api.assemblyai.com/v2/transcript/" + id;
-    let resMsg = await getItemFromDatabaseById(Transcript, aiUrl, id );
-    res.statusCode = resMsg.statusCode;
-    res.json(resMsg.result)
+    let result = await getItemFromDatabaseById(Transcript, id );
+    console.log(result)
+    console.log("result")
+    console.log("result")
+    console.log("result")
+    // res.statusCode = resMsg.statusCode;
+    res.json(result)
 })
 
 const errorHandler = (response, data) => {
     let statusCode = "";
     let errorMsg = "";
-    if (response.statusCode >= 200 && response.statusCode < 300 && data?.status?.toLowerCase() != "completed") {
+    if (response.statusCode >= 200 && response.statusCode < 300 ) { // && data?.status?.toLowerCase() != "completed"
         console.log("(409) conflict request. Transcription not complete, status code: ", response.statusCode)
         statusCode = 400;
         errorMsg = "Transcription not complete :/";

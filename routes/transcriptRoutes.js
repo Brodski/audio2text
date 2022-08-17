@@ -33,6 +33,26 @@ router.get("/allTsDbFull", async (req, res) => {
     res.json(allTrans)
 })
 
+router.get("/allTranscriptsAAI", async (req, res) => {
+    let qLimit = 69;
+    let qStatus = "completed";
+    let resMsg = await getFromAssemblyAi (`https://api.assemblyai.com/v2/transcript?limit=${qLimit}&status=${qStatus}`);
+
+    res.statusCode = resMsg.statusCode;
+    resMsg.data['errorMsg'] = resMsg.errorMsg
+    console.log("resMsg.data")
+    console.log("resMsg.data")
+    console.log(resMsg.data)
+    let trimmedRes = resMsg.data.transcripts?.map( ts =>  ts.id )
+
+    if ( resMsg.errorMsg) { 
+        console.log("shiiiit something went wrong: " + resMsg.data['errorMsg'] ) 
+        res.json(resMsg)
+    }
+    res.render("transcripts/allTrans", { allItems: trimmedRes })
+    // res.json(resMsg.data)
+
+})
 router.get("/allTranscriptsDb", async (req, res) => {
     const filter = {};
     let allTransIds = await Transcript.find(filter, {id: 1, _id: 0});
@@ -43,10 +63,57 @@ router.get("/allTranscriptsDb", async (req, res) => {
 
 })
 
-const getFromAssemblyAi = async (aiUrl) => {
-    return new Promise(function (resolve, reject) {
 
-        const options = { headers: { Authorization: process.env.ASSEMBLYAI_API_KEY } }
+
+// router.get('/transcript/:id/sentence', (req, res) => {
+router.get("/yt/test", async (req, res) => {
+    let videoId = "M7FIvfx5J10";
+    let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${process.env.YT_KEY}`; 
+    let response = await getFromAssemblyAi(ytUrl, "");
+    console.log(response)
+    console.log(response.items);
+    console.log("==========================");
+    console.log("==========================");
+    console.log("==========================");
+    let englishCcId = ""
+    response.data.items.forEach( item => {
+        // console.log(item.id);
+        // console.log(item.snippet?.videoId);
+        // console.log(item.snippet);
+        if (item.snippet?.language == "en") {
+            console.log(item);
+            console.log("ENGLISH", item.id)
+            englishCcId = item.id;
+            return;
+        }
+    })
+    if (englishCcId) {
+        //download cc
+        let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions/${englishCcId}?key=${process.env.YT_KEY}`;
+        console.log("ytUrl")
+        console.log(ytUrl)
+        let x = await getFromAssemblyAi(ytUrl, "");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log(x)
+
+    }
+    
+    res.statusCode = 200;
+    // res.send("GOOD!");
+    res.send("GOOD!");
+    return;
+})
+
+    
+//
+// Return resMsg = {statusCode, data, [errorMsg?] }
+//
+const getFromAssemblyAi = async (aiUrl, authoriziation = process.env.ASSEMBLYAI_API_KEY) => {
+    return new Promise(function (resolve, reject) {
+        const options = { headers: { Authorization: authoriziation } }
         let request = https.get(aiUrl, options, (response) => {
             console.log('statusCode:', response.statusCode);
             let data = ''
@@ -114,6 +181,33 @@ const saveToDb = (CollectionName) => {
     })
 }
 
+const errorHandler = (response, data) => {
+    let statusCode = "";
+    let errorMsg = "";
+    if (response.statusCode >= 200 && response.statusCode < 300 ) { // && data?.status?.toLowerCase() != "completed"
+        console.log("(409) conflict request. Transcription not complete, status code: ", response.statusCode)
+        statusCode = 400;
+        errorMsg = "Transcription not complete :/";
+    }
+    else if (response.statusCode >= 400 || response.statusCode < 500) {
+        console.log("(400) bad request, status code: ", response.statusCode)
+        statusCode = 400;
+        errorMsg = "Bad request :( ...Likely wrong ID ";
+    }
+    else if (response.statusCode > 500) {
+        console.log("(500) Assembly AI server error, status code: ", response.statusCode)
+        statusCode = 500;
+        errorMsg = "Assembly AI broke :(";
+    } else {
+        console.log("(400) Generic fail, status code: ", response.statusCode)
+        statusCode = 400;
+        errorMsg = "Generic 400";
+    }
+    return {statusCode, errorMsg}
+
+}
+
+
 router.get("/transcript/:id/paragraphs", async (req, res) => {
     const id = req.params.id;
     const aiUrl = "https://api.assemblyai.com/v2/transcript/" + id + "/paragraphs";
@@ -121,12 +215,7 @@ router.get("/transcript/:id/paragraphs", async (req, res) => {
     // let resMsg = await getItemFromDatabaseById(TranscriptParagraphs, aiUrl, id );
     if (resMsg == null || resMsg == "") { // It's not in DB, need to get from AssemblyAI
         console.log("RESULT NOT FOUND IN DB")
-        
-        console.log("00000 resMsg")
-        console.log("00000 resMsg")
-        console.log("00000 resMsg")
-        console.log("00000 resMsg")
-        console.log("00000 resMsg")
+
         console.log("00000 resMsg")
         resMsg = await getFromAssemblyAi(aiUrl)
 
@@ -155,37 +244,38 @@ router.get('/transcript/:id', async (req, res) => {
     res.json(result)
 })
 
-const errorHandler = (response, data) => {
-    let statusCode = "";
-    let errorMsg = "";
-    if (response.statusCode >= 200 && response.statusCode < 300 ) { // && data?.status?.toLowerCase() != "completed"
-        console.log("(409) conflict request. Transcription not complete, status code: ", response.statusCode)
-        statusCode = 400;
-        errorMsg = "Transcription not complete :/";
+
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////    VIDS       ////////////////////////
+//////////////    VIDS       ////////////////////////
+//////////////    VIDS       ////////////////////////
+//////////////    VIDS       ////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+
+//  All s3 items should be formated as <id>_ID_<name>
+const parseIdFromName = (s3Name) => {
+    let idx = s3Name.toUpperCase().indexOf("_ID_");
+    if (idx == -1) {
+        return {id: null, name: s3Name }
     }
-    else if (response.statusCode >= 400 || response.statusCode < 500) {
-        console.log("(400) bad request, status code: ", response.statusCode)
-        statusCode = 400;
-        errorMsg = "Bad request :( ...Likely wrong ID ";
-    }
-    else if (response.statusCode > 500) {
-        console.log("(500) Assembly AI server error, status code: ", response.statusCode)
-        statusCode = 500;
-        errorMsg = "Assembly AI broke :(";
-    } else {
-        console.log("(400) Generic fail, status code: ", response.statusCode)
-        statusCode = 400;
-        errorMsg = "Generic 400";
-    }
-    return {statusCode, errorMsg}
+    let name = s3Name.substring(idx+4);
+    let id = s3Name.substring(0,idx);
+    return {id, name}
 
 }
-
 
 router.get("/allvids", (req, res) => {
     console.log(allVids)
      // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
-     let url = "https://d2h6hz1aakujaj.cloudfront.net"
+     let url = "https://d2h6hz1aakujaj.cloudfront.net";
      let request = https.get(url, {headers: "application/xml"} , (response) => {
          let data = ''
          response.on('data', function (chunk) {
@@ -197,16 +287,24 @@ router.get("/allvids", (req, res) => {
              if (response.statusCode >= 200 && response.statusCode < 300 ) {
                  console.log("trying to save....")
                  console.log("status", data?.status)
-                 parseString(data, function (err, result) {
+                 // using xml2js
+                 parseString(data, function (err, result) { 
                      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxx111111111")
                      let allVids = result?.ListBucketResult?.Contents?.filter( item => {
                         return (item.Key[0].slice(-1) != "/")
                      })
                      allVids = allVids.map( item => {
-                        return item.Key[0];
+                        // return parseIdFromName(item.Key[0] );
+                        return (item.Key[0] );
                      })
-                     console.log("xxxxxxxxxxxxxxxxxxxxxxxxxx")
+                     let allVidsXXX = allVids.map (item => {
+                        let idName = parseIdFromName(item)
+                        return (idName)
+                     })
+                     console.log("allVids")
                      console.log(allVids)
+                     console.log("allVidsXXXXXXX")
+                     console.log(allVidsXXX)
                      res.render("videos/all", {allVids})
                  })
              }
@@ -221,7 +319,15 @@ router.get("/allvids", (req, res) => {
 
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 router.get('/test-transcript', (req, res) => {
 

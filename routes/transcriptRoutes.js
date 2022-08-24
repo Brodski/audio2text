@@ -5,22 +5,178 @@ const router = express.Router();
 const blogController = require("../controllers/blogController");
 const { Transcript } = require('../models/transcript');
 const { TranscriptParagraphs } = require('../models/transcript');
+const { Captions } = require('../models/captions');
+const { Captions2 } = require('../models/captions');
 const cors = require("cors");
 const { appendFile } = require('node:fs');
 require("dotenv").config();
 const allVids = require("../models/allVids");
 const parseString = require('xml2js').parseString;
 
-// console.log(process.env.MY_VAR)
-// console.log(process.env.NUMBER)
-// console.log(process.env.ASSEMBLYAI_API_KEY)
+const csv = require("csvtojson");
+
+
 
 // https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences
 
+// router.get('/transcript/:id/sentence', (req, res) => {
 
 
 
 // router.get('/transcript/:id/sentence', (req, res) => {
+router.get("/yt/test", async (req, res) => {
+    let videoId = "M7FIvfx5J10";
+    let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${process.env.YT_KEY}`; 
+    let response = await makeHttpRequest(ytUrl, "");
+    console.log(response)
+    console.log(response.items);
+    console.log("==========================");
+    console.log("==========================");
+    console.log("==========================");
+    let englishCcId = ""
+    response.data.items.forEach( item => {
+        // console.log(item.id);
+        // console.log(item.snippet?.videoId);
+        // console.log(item.snippet);
+        if (item.snippet?.language == "en") {
+            console.log(item);
+            console.log("ENGLISH", item.id)
+            englishCcId = item.id;
+            return;
+        }
+    })
+    if (englishCcId) {
+        //download cc
+        let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions/${englishCcId}?key=${process.env.YT_KEY}`;
+        console.log("ytUrl")
+        console.log(ytUrl)
+        let x = await makeHttpRequest(ytUrl, "");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log("++++++++++++++++++++++++++++++++++++++++++++");
+        console.log(x)
+
+    }
+    
+    res.statusCode = 200;
+    // res.send("GOOD!");
+    res.send("GOOD!");
+    return;
+})
+    
+router.get("/test/csvFind", async (req, res) => {
+    // db.collection.aggregate([
+    //     {
+    //       $project: {
+    //         highmarks: {
+    //           $filter: {
+    //             input: "$captions",
+    //             as: "thecaps",
+    //             // cond: { $gte: [ "$$thecaps.fukboy", "69" ] }
+    //             cond: {
+    //               "$regexMatch": {
+    //                 "input": "$$thecaps.Transcript",
+    //                 "regex": "xxx",
+    //                 "options": "i"
+    //               }
+    //             }//$toBool: {
+                
+    //           }
+    //         }
+    //       }
+    //     }
+    //   ])
+    // let resultzz = await Captions.find({
+    //     // captions: { $elemMatch: { fukboy: "in your head rent free" }  }
+    //     // captions: { $elemMatch: { Transcript: { $regex: "/hairdresser/i" }}  }
+    //     captions: { $elemMatch: { Transcript: 'There are a lot of election deniers, one in Arizona and a bunch of other states.'}  }
+    //     // "age": "69" 
+    // }).then ( rez => { 
+    //     console.log("rez")
+    //     console.log(rez)
+    //     return rez;
+    // })
+    // let resultzz = await Captions.find({
+    //     captions: { 
+    //         "Transcript": { $regex: "/hairdresser/i" } 
+    //     }
+    // })
+    // "$indexOfArray": ["$captions", { Transcript: 'There are a lot of election deniers, one in Arizona and a bunch of other states.'}
+    let resultzz = await Captions.aggregate([
+        {
+          $project: {
+            highmarks: {
+              $filter: {
+                input: "$captions",
+                as: "thecaps",
+                // cond: { $gte: [ "$$thecaps.fukboy", "69" ] }
+                cond: {
+                  "$regexMatch": {
+                    "input": "$$thecaps.Transcript",
+                    "regex": "trump",
+                    "options": "i"
+                  }
+                }//$toBool: {
+                
+              }
+            }
+          }
+        }        
+    ]).then ( rez => { 
+        console.log("rez")
+        console.log(rez)
+        return rez;
+    })
+    console.log("resultzz")
+    console.log("resultzz")
+    console.log("resultzz")
+    console.log("resultzz")
+    console.debug("%o",resultzz)
+    console.log("****")
+    res.render("./transcripts/blank")
+
+})
+    
+router.get("/test/csv", async (req, res) => {
+    let csvUrl = process.env.CDN_DOMAIN + "/vids/maherTest/maherecsv.csv";
+    let response = await makeHttpRequest(csvUrl, process.env.ASSEMBLYAI_API_KEY , true)
+    console.log(response)
+    console.log(response.statusCode)
+    console.log(response.data)
+    console.log('CSV')
+    console.log('CSV')
+    console.log('CSV')
+    console.log('CSV')
+    console.log('CSV')
+    console.log('CSV') 
+    // csv({output:"line"})
+    let captions = await csv()
+    .fromString(response.data)
+    .subscribe((csvObj)=>{ 
+        csvObj.Transcript = csvObj.Transcript?.replace("\r", " ");
+        csvObj.fukboy = "in your head rent free";
+    })
+    console.log("---------------")
+    console.log("---------------")
+    console.log(captions)
+    console.log("DONE!")
+    // const captions = new Captions(x);
+    const captionsMongoose = new Captions({
+        captions,
+        age: "69"
+    });
+    captionsMongoose.save().then( (result) => {
+        console.log("save success!.")
+    })
+    .catch( err => {
+        console.log("(My error csv) Error occured", err)
+    })
+    console.log(captionsMongoose)
+    res.json({captions} )
+    // res.render('transcripts/blank')
+}) 
+
 router.get("/customGet", async (req, res) => {
     res.render("transcripts/customGet")
 })
@@ -36,7 +192,7 @@ router.get("/allTsDbFull", async (req, res) => {
 router.get("/allTranscriptsAAI", async (req, res) => {
     let qLimit = 69;
     let qStatus = "completed";
-    let resMsg = await getFromAssemblyAi (`https://api.assemblyai.com/v2/transcript?limit=${qLimit}&status=${qStatus}`);
+    let resMsg = await makeHttpRequest(`https://api.assemblyai.com/v2/transcript?limit=${qLimit}&status=${qStatus}`);
 
     res.statusCode = resMsg.statusCode;
     resMsg.data['errorMsg'] = resMsg.errorMsg
@@ -64,57 +220,14 @@ router.get("/allTranscriptsDb", async (req, res) => {
 })
 
 
-
-// router.get('/transcript/:id/sentence', (req, res) => {
-router.get("/yt/test", async (req, res) => {
-    let videoId = "M7FIvfx5J10";
-    let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${process.env.YT_KEY}`; 
-    let response = await getFromAssemblyAi(ytUrl, "");
-    console.log(response)
-    console.log(response.items);
-    console.log("==========================");
-    console.log("==========================");
-    console.log("==========================");
-    let englishCcId = ""
-    response.data.items.forEach( item => {
-        // console.log(item.id);
-        // console.log(item.snippet?.videoId);
-        // console.log(item.snippet);
-        if (item.snippet?.language == "en") {
-            console.log(item);
-            console.log("ENGLISH", item.id)
-            englishCcId = item.id;
-            return;
-        }
-    })
-    if (englishCcId) {
-        //download cc
-        let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions/${englishCcId}?key=${process.env.YT_KEY}`;
-        console.log("ytUrl")
-        console.log(ytUrl)
-        let x = await getFromAssemblyAi(ytUrl, "");
-        console.log("++++++++++++++++++++++++++++++++++++++++++++");
-        console.log("++++++++++++++++++++++++++++++++++++++++++++");
-        console.log("++++++++++++++++++++++++++++++++++++++++++++");
-        console.log("++++++++++++++++++++++++++++++++++++++++++++");
-        console.log(x)
-
-    }
-    
-    res.statusCode = 200;
-    // res.send("GOOD!");
-    res.send("GOOD!");
-    return;
-})
-
     
 //
 // Return resMsg = {statusCode, data, [errorMsg?] }
 //
-const getFromAssemblyAi = async (aiUrl, authoriziation = process.env.ASSEMBLYAI_API_KEY) => {
+const makeHttpRequest = async (myUrl, authoriziation = process.env.ASSEMBLYAI_API_KEY, isCsv = false) => {
     return new Promise(function (resolve, reject) {
         const options = { headers: { Authorization: authoriziation } }
-        let request = https.get(aiUrl, options, (response) => {
+        let request = https.get(myUrl, options, (response) => {
             console.log('statusCode:', response.statusCode);
             let data = ''
             response.on('data', function (chunk) {
@@ -124,7 +237,7 @@ const getFromAssemblyAi = async (aiUrl, authoriziation = process.env.ASSEMBLYAI_
         
             response.on('end', function () {
                 resMsg = {}
-                data = JSON.parse(data)
+                data = isCsv ? data : JSON.parse(data);
                 delete data.words
                 console.log("data?.status", data?.status);
                 console.log("response.statusCode ", response.statusCode );
@@ -167,17 +280,17 @@ const saveToDb = (CollectionName) => {
     const transcript = new CollectionName(data);
     transcript.save().then( (result) => {
         console.log("save success!.")
-        resMsg = {
-            statusCode: 200, 
-            data: result
-        }
+        // resMsg = {
+        //     statusCode: 200, 
+        //     data: result
+        // }
     })
     .catch( err => {
         console.log("(My error) Error occured", err)
-        resMsg = {
-            statusCode: 500, 
-            errorMsg: "Saving data to mongo failed :( " + err, 
-        }
+        // resMsg = {
+        //     statusCode: 500, 
+        //     errorMsg: "Saving data to mongo failed :( " + err, 
+        // }
     })
 }
 
@@ -217,10 +330,10 @@ router.get("/transcript/:id/paragraphs", async (req, res) => {
         console.log("RESULT NOT FOUND IN DB")
 
         console.log("00000 resMsg")
-        resMsg = await getFromAssemblyAi(aiUrl)
+        resMsg = await makeHttpRequest(aiUrl)
 
         // if (resMsg.statusCode >= 200 && response.statusCode < 300 ) {
-        //     saveToDb(TranscriptParagraphs)
+        //     resMsg = await saveToDb(TranscriptParagraphs)
         // }
     }
     console.log("XXX resMsg")
@@ -498,3 +611,74 @@ router.get('/null-transcript', (req, res) => {
     
 
 module.exports = router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // db.collection.find()
+// db.collection.aggregate([
+//     {
+//       $project: {
+//         highmarks: {
+//           $filter: {
+//             input: "$captions",
+//             as: "thecaps",
+//             // cond: { $gte: [ "$$thecaps.fukboy", "69" ] }
+//             cond: {
+//               $toBool: {
+//                 $eq: [
+//                   "$$thecaps.fukboy",
+//                   "in your head rent free"
+//                 ]
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   ])
+  
+  
+//   // db.collection.find()
+//   db.collection.aggregate([
+//       {
+//         $project: {
+//           highmarks: {
+//             $filter: {
+//               input: "$captions",
+//               as: "thecaps",
+//               // cond: { $gte: [ "$$thecaps.fukboy", "69" ] }
+//               cond: {
+//                 $in: [
+//                   "/head/i",
+//                   "$$thecaps"
+//                 ]
+//               }//$toBool: {
+              
+//             }
+//           }
+//         }
+//       }
+//     ])

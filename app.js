@@ -7,6 +7,7 @@ const app = express()
 const cors = require("cors");
 const blogRoutes = require('./routes/blogRoutes');
 const transcriptRoutes = require('./routes/transcriptRoutes');
+const testRoutes = require('./routes/testRoutes');
 require("dotenv").config();
 
 
@@ -39,6 +40,7 @@ var corsOptions = { origin: '*' }
 app.use(cors(corsOptions))
 app.use(blogRoutes)
 app.use(transcriptRoutes)
+app.use(testRoutes)
 
 
 app.options('*', cors(corsOptions));

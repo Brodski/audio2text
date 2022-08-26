@@ -20,6 +20,20 @@ async function go() {
     // console.log(s3)
     let params = { "Bucket": bucketName }
     
+    // https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html
+    // AWS Identity and Access Management (IAM) policy, you must have permissions to perform the s3:ListBucket action
+    // const response = s3.listObjectsV2(params, function(err, data) {
+    //     if (err) {
+    //         console.error("ripx", err);
+    //     }
+    //     else {
+    //         console.log(data)
+    //     }
+
+    // })
+    // console.log(response)
+
+    
     // // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
     // let url = "https://d2h6hz1aakujaj.cloudfront.net"
     // let request = await https.get(url, {headers: "application/xml"} , (response) => {
@@ -66,17 +80,4 @@ async function go() {
 
 module.exports = { go };
 
-
-// https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html
-// AWS Identity and Access Management (IAM) policy, you must have permissions to perform the s3:ListBucket action
-// const response = s3.listObjectsV2(params, function(err, data) {
-//     if (err) {
-//         console.error("ripx", err);
-//     }
-//     else {
-//         console.log(data)
-//     }
-
-// })
-// console.log(response)
 

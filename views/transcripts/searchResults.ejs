@@ -1,0 +1,14 @@
+
+<%- include('../partials/head.ejs') %>
+<div class="container" id="searchResults">
+
+    <div> Nice </div>
+    <div>  You searched for <%= body.query %> </div>
+    <% for (let i=0; i<body.results.length; i ++)  { %>
+        <div> <%= i %> </div> 
+    <% } %>
+    
+    <% var x = JSON.stringify(body) %>
+    
+    
+</div>

@@ -1,0 +1,35 @@
+
+<%- include('../partials/head.ejs') %>
+<div class="container" id="search">
+    <div id="main">
+        <h3>Search all transcripts</h3>
+        <label> 
+            <input id="searchInp" placeholder="eg. challenger every season"/>
+        </label>
+        <button id="searchBtn" onclick="doSearch(event)">Go</button>
+    </div>
+
+    <div class="heading_sub1">Tips</div>
+    <hr/>
+    <div>
+        <span class="search_hint">Exact phase: </span>
+        <span class="search_ex"><i>challenger every season</i></span>
+    </div>
+    <div>
+        <span class="search_hint">Multiple phases: </span>
+        <span class="search_ex"><i> lot of money OR challenger OR subhuman</i></span>
+    </div>
+</div>
+<script>
+
+    function doSearch(e) {
+        e.preventDefault()
+        let v = document.querySelector("#searchInp").value
+        console.log(v)
+        window.location.href = "/api/search?search=" + v;
+        // fetch("/api/search?search=" + v, { method: "get" })
+        //     .then(res => res.text())
+        //     .then(data => console.log(data))
+    }
+
+</script>

@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-// const { render } = require('ejs');
-// const { response } = require('express');
 const blogController = require("../controllers/blogController");
 const Blog = require('../models/blog');
 const Transcript = require('../models/transcript');

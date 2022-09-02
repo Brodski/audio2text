@@ -8,6 +8,7 @@ const cors = require("cors");
 const blogRoutes = require('./routes/blogRoutes');
 const transcriptRoutes = require('./routes/transcriptRoutes');
 const testRoutes = require('./routes/testRoutes');
+const myCron = require('./jobs/jobs'); // This calls cron
 require("dotenv").config();
 
 

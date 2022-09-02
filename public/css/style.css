@@ -2,6 +2,75 @@ nav .header {
   background-color: antiquewhite;
 }
 
-body {
-  background-color: grey;;
+html {
+  background-color: grey;
+  font-size: 24px;
+
+}
+
+@media (max-width: 1600px) {
+  .container {
+    width: 60%;
+  }
+}
+@media (max-width: 1200px) {
+  .container {
+    width: 70%;
+  }
+}
+@media (max-width: 666px) {
+  .container {
+    width: 90%;
+  }
+}
+
+p,h1,h2,h3,h4,h5 {
+  margin: 0;
+}
+
+button {
+  border-radius: 6px;
+  padding: 4px 16px 4px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+input {
+  margin: 4px 0 4px 0;
+  padding: 4px;
+  border-radius: 6px;
+  width: 100%;
+  margin: 12px 0 12px 0;
+}
+
+#search input {
+}
+
+#search h3 {
+  padding-bottom: 8px;
+
+}
+
+#search {
+  /* margin: 0 16px 0 16px; */
+  margin: 0 auto 0 auto;
+
+}
+#search #main {
+  border-radius: 16px;
+  /* width: 500px; */
+  border: 1px solid;
+  padding: 50 50 50 50;
+  margin: 100 0 80 0;
+}
+
+#search p,
+#search span {
+  font-size: 1rem;
+}
+#search .search_ex {
+  padding-left: 0;
+}
+
+#search .search_hint {
+  font-weight: 600;
 }

@@ -12,8 +12,11 @@ const cors = require("cors");
 require("dotenv").config();
 const allVids = require("../models/allVids");
 const parseString = require('xml2js').parseString;
+const FolderItemsS3 = require('../models/FolderItemsS3');
+const { S3_vid_path } = require('../models/Constantz.js');
 
 const csv = require("csvtojson");
+const { parseStringPromise } = require('xml2js');
 
 
 
@@ -21,136 +24,213 @@ const csv = require("csvtojson");
 
 // router.get('/transcript/:id/sentence', (req, res) => {
 
-
-router.get("/allTsDbFull", async (req, res) => {
-
-    let allTrans = await Transcript.find({});
-    console.log("allTrans")
-    console.log(allTrans)
-    res.json(allTrans)
+router.get("/search", async (req, res) => {
+    res.render("transcripts/search")
 })
 
-router.get("/allTranscriptsAAI", async (req, res) => {
-    let qLimit = 69;
-    let qStatus = "completed";
-    let aiUrl = `https://api.assemblyai.com/v2/transcript?limit=${qLimit}&status=${qStatus}`
-    let resMsg = await common.makeHttpRequest(aiUrl, { headers: { Authorization: authoriziation } });
+router.get("/api/search", async (req, res) => {
+    console.log("got this req.query", req.query);
+    console.log("got this req.params", req.params);
 
-    res.statusCode = resMsg.statusCode;
-    resMsg.data['errorMsg'] = resMsg.errorMsg
-    console.log("resMsg.data")
-    console.log("resMsg.data")
-    console.log(resMsg.data)
-    let trimmedRes = resMsg.data.transcripts?.map( ts =>  ts.id )
-
-    if ( resMsg.errorMsg) { 
-        console.log("shiiiit something went wrong: " + resMsg.data['errorMsg'] ) 
-        res.json(resMsg)
-    }
-    res.render("transcripts/allTrans", { allItems: trimmedRes })
-    // res.json(resMsg.data)
-
-})
-router.get("/allTranscriptsDb", async (req, res) => {
-    const filter = {};
-    let allTransIds = await Transcript.find(filter, {id: 1, _id: 0});
-    allTransIds = allTransIds.filter( x => x.id != null )
-    allTransIds = allTransIds.map( x => x.id)
-    console.log("allTransIds", allTransIds)
-    res.render("transcripts/allTrans", { allItems: allTransIds })
-
-})
-
-const getItemFromDatabaseById = async (CollectionName, id) => {
-    let result = await CollectionName.findOne({"id": id}).then( result =>  {
-        console.log(result?.id)
-        console.log(result?._id)
-        // Check if in my Database
-        return result;
+    let querySearch = common.processQuery(req.query.search);
+    // processQuery("big nasty string");
+    console.log("QUERY SEARCH FINAL =", querySearch);
+    let resultzz = await Captions.aggregate([
+        {
+          $project: {
+            title: 1,
+            queriedCaptions: {
+              $filter: {
+                input: "$captions",
+                as: "thecaps",
+                cond: {
+                  "$regexMatch": {
+                    "input": "$$thecaps.Transcript",
+                    // "regex": "trump|New York",
+                    "regex": querySearch,
+                    "options": "i"
+                  }
+                }                
+              }
+            }
+          }
+        }        
+    ]).then ( rez => { 
+        return rez;
     })
-    console.log("did it wait???????????????")
-    console.log("did it wait???????????????")
-    console.log(result)
-    return result
-}
-const saveToDb = (CollectionName) => {
-    const transcript = new CollectionName(data);
-    transcript.save().then( (result) => {
-        console.log("save success!.")
-        // resMsg = {
-        //     statusCode: 200, 
-        //     data: result
+    console.log("resultzz")
+    console.log("resultzz")
+    console.log("resultzz")
+    console.log("resultzz")
+    // console.debug("%o",resultzz)
+    console.log("****")
+    let body = {
+        query: querySearch,
+        results: resultzz
+    };
+    console.log(body)
+    // res.send(body)
+    res.render("./transcripts/searchResults", { body } )
+    // res.render("./transcripts/blank")
+
+})
+
+
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////    CDN VIDS       /////////////////////////
+//////////////    CDN VIDS       /////////////////////////
+//////////////    CDN VIDS       /////////////////////////
+//////////////    CDN VIDS       /////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+
+const saveCaptionsInDbAux = async (urlPath) => {
+    let csvUrl = process.env.CDN_DOMAIN + "/" + urlPath;
+    console.log("csvUrl=", csvUrl)
+
+    // let response = await common.makeHttpRequest(csvUrl, process.env.ASSEMBLYAI_API_KEY , true)
+    let response = await common.makeHttpRequest(csvUrl)
+    // console.log(response)
+    console.log(response.statusCode)
+    // console.log(response.data)
+    console.log('CSV below')
+    console.log('CSV below')
+    let captions = await csv() //csvtojson library
+    .fromString(response.data)
+    .subscribe((csvObj)=>{ 
+        csvObj.Transcript = csvObj.Transcript?.replace("\r", " ");
+        // if (csvObj['Start Time']) {
+        //     csvObj['Start'] = csvObj['Start Time']
+        //     delete csvObj['Start Time']
+        // }
+        // if (csvObj['End Time']) {
+        //     csvObj['End'] = csvObj['End Time']
+        //     delete csvObj['End Time']
         // }
     })
-    .catch( err => {
-        console.log("(My error) Error occured", err)
-        // resMsg = {
-        //     statusCode: 500, 
-        //     errorMsg: "Saving data to mongo failed :( " + err, 
-        // }
-    })
-}
-
-
-
-router.get("/transcript/:id/paragraphs", async (req, res) => {
-    const id = req.params.id;
-    const aiUrl = "https://api.assemblyai.com/v2/transcript/" + id + "/paragraphs";
-    let resMsg = "";
-    // let resMsg = await getItemFromDatabaseById(TranscriptParagraphs, aiUrl, id );
-    if (resMsg == null || resMsg == "") { // It's not in DB, need to get from AssemblyAI
-        console.log("RESULT NOT FOUND IN DB")
-
-        console.log("00000 resMsg")
-        resMsg = await common.makeHttpRequest(aiUrl, { headers: { Authorization: authoriziation } })
-
-        // if (resMsg.statusCode >= 200 && response.statusCode < 300 ) {
-        //     resMsg = await saveToDb(TranscriptParagraphs)
-        // }
-    }
-    console.log("XXX resMsg")
-    console.log("XXX resMsg")
-    console.log("XXX resMsg")
-    console.log("XXX resMsg")
-    console.log( resMsg)
-    res.statusCode = resMsg.statusCode;
-    res.json(resMsg.data)
-})
+    console.log("######################")
+    // console.log(captions)
+    console.log("DONE!", csvUrl)
+    // const captions = new Captions(x);
+    const captionsMongoose = new Captions({
+        captions,
+        // title: "real time with my man bill"
+    });
     
-router.get('/transcript/:id', async (req, res) => {
-    const id = req.params.id;
-    const aiUrl = "https://api.assemblyai.com/v2/transcript/" + id;
-    let result = await getItemFromDatabaseById(Transcript, id );
-    console.log(result)
-    console.log("result")
-    console.log("result")
-    console.log("result")
+    // captionsMongoose.save().then( (result) => {
+    //     console.log("save success!.")
+    // })
+    // .catch( err => {
+    //     console.log("(My error csv) Error occured", err)
+    // })
+    console.log("FAKE SAVE!!!!!")
+    // console.log(captionsMongoose)
+    // res.json({captions} )
+    return captions;
+    // res.render('transcripts/blank')
+
+}
+
+const saveCaptionsInDb = async (everyFolderConts) => {
+    // for (let i=0; i< everyFolderConts.length; i++) {
+    let count = 0;
+    for (let i=0; i< 3; i++) {
+        console.log("saveCaptionsInDb - x[i].csvPath",  everyFolderConts[i].csvPath)
+        console.log("saveCaptionsInDb - CNt=", count)
+        count++;
+        let result = await Captions.findOne({"csvPath": everyFolderConts[i].csvPath}).then( result =>  {
+            console.log("saveCaptionsInDb - Checking captions")
+            console.log("saveCaptionsInDb result - " , result)
+            // console.log(result?.id)
+            // console.log(result?._id)
+            // Check if in my Database
+            if (result == null) {
+                saveCaptionsInDbAux(everyFolderConts[i].csvPath)
+                // const caps = new Captions(data);
+                // caps.save().then( (result) => {
+                //     console.log("save success!.", result)
+                // })
+                // .catch( err => {
+                //     console.log("(MongoDb error) Error occured saving ", err)
+                // })
+
+            } else {
+                console.log("saveCaptionsInDb -Not saving")
+            }
+        })
+        // console.log(result)    
+    } 
     // res.statusCode = resMsg.statusCode;
-    res.json(result)
+    // res.json(result)
+}
+
+
+
+
+// everyFolderConts =  [
+//    FolderItemsS3 { 
+//       csvPath: 'vids/maherTest/maherecsv.csv',
+//       vidPath: 'vids/maherTest/Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p.mp4',
+//       vidTitle: 'Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p'
+//    },
+//      ...
+//      ...
+// ]    
+const updateDbWithS3 = () => {
+
+    return new Promise( async (resolve, reject) => {
+
+        let url = "https://d2h6hz1aakujaj.cloudfront.net";
+        let request = https.get(url, {headers: "application/xml"} , (response) => {
+            let data = ''
+            response.on('data', function (chunk) {
+                data += chunk;
+            });
+        
+            response.on('end', async function () {
+                if (response.statusCode >= 200 && response.statusCode < 300 ) {
+                    let result = await parseStringPromise(data)  // xml2js
+                       .then( dt => { return dt })
+                       .catch(err => { return err })
+                   let everyFolderConts = getEveryFolderContents(result)
+                   console.log("everyFolderConts")
+                   console.log("(OMITED)")
+                //    console.log(everyFolderConts)
+                   let isRecentUpdated = saveCaptionsInDb(everyFolderConts)
+                   resolve(200);
+                }
+            }).on('error', (e) => {
+                console.error(e);
+                reject(400);
+            });
+        });    
+    })
+
+}
+
+router.get("/cdn/allvids", async (req, res) => {
+    // console.log(allVids)
+    // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
+    console.log("START gonna do stuff")
+    let x = await updateDbWithS3()
+    console.log("END  do stuff")
+    console.log("END  x", x)
+    if (x == 200 ) {
+        res.send("Complete")
+    }
+    else {
+        res.statusCode = 400;
+        res.send("Error :(")
+    }
+     
 })
 
 
-//////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
-//////////////    CDN VIDS       /////////////////////////
-//////////////    CDN VIDS       /////////////////////////
-//////////////    CDN VIDS       /////////////////////////
-//////////////    CDN VIDS       /////////////////////////
-//////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
 
-
-
-router.get("/test/getMahercsv", async (req, res) => {
-    let csvUrl = process.env.CDN_DOMAIN + "/vids/maherTest/maherecsv.csv";
-    res.writeHead(302, {
-        'Location': csvUrl
-      });
-      res.end();
-})
 
 /* --------------------------------- */
 /* --------------------------------- */
@@ -175,63 +255,98 @@ router.get("/test/getMahercsv", async (req, res) => {
 // vids/maherTest/maherecsv.csv
 
 
+const getFolderContents = (allFolderNames, allItemsS3) => {
 
-const getFolderContents = (folderName, allItemsS3) => {
-    // s3Item = 'vids/maherTest/maherecsv.csv', 
-    // folderName = maherTest
-    let filt = allItemsS3.filter( s3Item => {
-        console.log("s3Item ===>", s3Item)
-        console.log("name ??????", folderName )
-        return s3Item.includes(folderName)
+    let allFolderConts = allFolderNames.map (folderName => { 
+        console.log("name -------------", folderName, "-------------" )
+        let filt = allItemsS3.filter( s3Item => {
+            // console.log("s3Item ===>", s3Item)
+            return s3Item.includes(folderName)
+        })
+        let folderItemsS3 = new FolderItemsS3()
+        filt.forEach( x => {
+            if (x.endsWith('.csv')) {
+                folderItemsS3.csvPath = x;
+            }
+            if (x.endsWith('.mp4')) {
+                folderItemsS3.vidPath = x;
+                folderItemsS3.vidTitle = x.split('/').slice(-1)[0].replace('.mp4', '');
+            }
+        })
+        return folderItemsS3;
     })
-    console.log("DONE ", filt)
+    return allFolderConts
     
 }
 
+const getAllVidFolderNamesHack = (allItemsS3) => {
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log(S3_vid_path)
+    console.log(S3_vid_path)
+    console.log(S3_vid_path)
+    console.log(S3_vid_path)
+    let vidsFolder = []
+    allItemsS3.forEach( itemPath => { 
+        if ( !itemPath.startsWith(S3_vid_path)) {
+            return;
+        }
+        let x = itemPath.split('/');
+        let folderPath = x[0] + '/' + x[1] + '/'
+        vidsFolder.push(folderPath);
+    })
 
-const getAllBucketsHack = (itemPath) => {
-    console.log("------", itemPath, "------")
-    const S3_vid_path = "vids/";
-    if ( !itemPath.includes(S3_vid_path)) {
-        return;
-    }
-    let split = itemPath.split("/")
-    let half_1st = split[0];
-    let bucketName = split[1];
-    let half_3rd = split.slice(2).join('/');
-    // console.log("buckets - half 1st", half_1st)
-    // console.log("buckets - half 2nd", bucketName)
-    // console.log("buckets - half 3rd", half_3rd)
-    return bucketName
-}
-
-const parseIdFromName = (itemPath) => {
-    console.log("------", itemPath, "------")
-    const S3_vid_path = "vids/";
-    if ( !itemPath.includes(S3_vid_path)) {
-        return;
-    }
-
-
-    getAllBucketsHack(itemPath)
-    // if (itemPath.toUpperCase().indexOf("_ID_") != -1) {
-    //     return parseIdFromName_OLDASSEBMLY();
-    // }
-    // // let split = itemPath.split('/')
-
-    // let idx = itemPath.indexOf(S3_vid_path) + S3_vid_path.length;
     
-    // let half_2nd = itemPath.slice(idx);          // 'maherTest/Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p.mp4'
-    // let half_1st = itemPath.slice(0, idx);      // 'vids/'
-    // console.log("half_1st", half_1st);
-    // console.log("half_2nd", half_2nd); 
-    // let idx2 = half_2nd.indexOf('/');
-    // let folderName = half_2nd.slice(0,idx2)
-    // // let folderName = itemPath.slice(0,idx2)
-    // // console.log("itemPath")
-    // console.log("idx2", idx2)
-    // console.log("folderName", folderName)
-
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    vidsFolder = [...new Set(vidsFolder)]
+    console.log(vidsFolder)
+    return vidsFolder
+    // let allFolderNames = allItemsS3.map( itemPath => { 
+    //     console.log("------", itemPath) 
+    //     const S3_vid_path = S3VideoRootFolder;
+    //     if ( !itemPath.startsWith(S3_vid_path)) {
+    //         return;
+    //     }
+    //     let split = itemPath.split("/")
+    //     let half_1st = split[0];
+    //     let folderName = split[1];
+    //     let half_3rd = split.slice(2).join('/');
+    //     // console.log("folderName - half 1st", half_1st)
+    //     // console.log("folderName - half 2nd", folderName)
+    //     // console.log("folderName - half 3rd", half_3rd)
+    //     return folderName
+    // })
+    // allFolderNames = allFolderNames.filter(folder => { return folder != null })
+    // allFolderNames = [...new Set(allFolderNames)]
+    // return allFolderNames
 }
 //  All s3 items should be formated as <id>_ID_<name>
 const parseIdFromName_OLDASSEBMLY = (s3Name) => {
@@ -245,62 +360,38 @@ const parseIdFromName_OLDASSEBMLY = (s3Name) => {
 
 }
 
-router.get("/cdn/allvids", (req, res) => {
-    console.log(allVids)
-     // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
-     let url = "https://d2h6hz1aakujaj.cloudfront.net";
-     let request = https.get(url, {headers: "application/xml"} , (response) => {
-         let data = ''
-         response.on('data', function (chunk) {
-             data += chunk;
-         });
-     
-         response.on('end', function () {
-             if (response.statusCode >= 200 && response.statusCode < 300 ) {
-                 // using xml2js
-                 parseString(data, function (err, result) { 
-                    console.log("Everythign from cd")
-                    console.log(2)
-                    // 1. only grab items, not folders (folders end in '/')
-                    let allItemsS3 = result?.ListBucketResult?.Contents?.filter( item => { 
-                        return (item.Key[0].slice(-1) != "/") 
-                    })
-                    console.log(2)
-                    // 2. item.Key is an array for some reason. Fix that.
-                    allItemsS3 = allItemsS3.map( item => { 
-                        return (item.Key[0] ); 
-                    })
-                    
-                    console.log(3)
-                    let allVids2 = allItemsS3.map (itemPath => { return parseIdFromName(itemPath) })
+const getEveryFolderContents = (result) => {
+    // 1. only grab items, not folders (folders end in '/')  
+    let allItemsS3 = result?.ListBucketResult?.Contents?.filter( item => { 
+        return (item.Key[0].slice(-1) != "/") 
+    })
+    console.log(1)
+    console.log("1 allItemsS3")
+    console.log(allItemsS3)
+    // 2. item.Key is an array for some reason. Fix that.
+    // allItemsS3 = [ 'some-folder/deep-folder/95024051_p0.jpg', 
+    //                'some-folder/deep-folder/TncMx-morgan-hultgren-51.jpg',                                                                                        'vids/maherTest/Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p.mp4',                                      'vids/maherTest/maherecsv.csv',
+    //                'vids/maherTest/mahertxt.txt' 
+    //                'vids/maherTest/maherecsv.csv',
+    //                'vids/maherTest/mahertxt.txt'    ]  
+    allItemsS3 = allItemsS3.map( item => {  return (item.Key[0] );  })
+    
+    console.log(2)
+    console.log("2 allItemsS3")
+    console.log(allItemsS3)
+    
+    
+    console.log(3)
+    let allFolderNames = getAllVidFolderNamesHack(allItemsS3) // Actually get everythign in "vids/"
 
-
-                    let allFolders = allItemsS3.map (itemPath => { return getAllBucketsHack(itemPath) })
-                    allFolders = allFolders.filter (folder => { return folder != null })
-                    allFolders = [...new Set(allFolders)]
-
-                    let folderConents = allFolders.map (folder => { return getFolderContents(folder, allItemsS3)  })
-                     
-                    console.log("allFolders")
-                    console.log(allFolders)
-                    console.log(4)
-                    console.log("allItemsS3")
-                    console.log(allItemsS3)
-                    console.log("allVids2")
-                    console.log(allVids2)
-                    res.send("end, gg ty")
-                    //  res.render("videos/all", {allVids})
-                 })
-             }
-             // res.send(JSON.parse(data))
-         }).on('error', (e) => {
-             console.error(e);
-             res.statusCode = 404
-             res.json({error: "Failed to get all vids :("})
-         });
-     });    
-})
-
+    console.log(3)
+    console.log(allFolderNames)
+    let everyVidFolderConents = getFolderContents(allFolderNames, allItemsS3) // We find the intersection of the two
+    console.log(4)
+    console.log("4 everyVidFolderConents")
+    console.log(everyVidFolderConents)
+    return everyVidFolderConents;
+}
 
 module.exports = router;
 

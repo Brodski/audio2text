@@ -1,6 +1,6 @@
 
 
-class FolderItemsS3 {
+class VidData {
     constructor(csvPath, vidPath, vidTitle) {
         this.csvPath = csvPath;
         this.vidPath = vidPath;
@@ -12,4 +12,4 @@ class FolderItemsS3 {
     // }
 }  
 
-module.exports = FolderItemsS3;
+module.exports = VidData;

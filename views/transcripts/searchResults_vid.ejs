@@ -1,0 +1,41 @@
+
+<div class="" id="searchResults_vid">
+
+    <% 
+//    let x = 1; 
+  //   let y = x +69;  
+   //  let w = 2;
+    //let q = w + y;
+    //let startTimexxx = new Date('1970-01-01T20:24:00');
+    %>
+    
+    <div>
+    </div>
+    
+    <% if (queriedCaptions && queriedCaptions.length > 0) {  %>
+        <div> ------------------ </div>
+        <div> <b> <%= vidTitle %> </b></div>
+        <video controls src='<%= process.env.CDN_DOMAIN + "/" + vidPath.replaceAll(" ", "+") %>'></video>
+        <div>  queriedCaptions.length <%= queriedCaptions.length %> </div>
+        <div>  queriedCaptions.length <%= queriedCaptions %> </div>
+        <% queriedCaptions.forEach( cap => { %>
+            <% 
+                let start = "" + cap['Start Time'].slice(0, -3); 
+                let end = "" + cap['End Time'].slice(0, -3); 
+                let startTime = new Date('1970-01-01T' + start + ".000+00:00");
+                let endTime = new Date('1970-01-01T' + end + ".000+00:00");
+            //  xxx = new Date("1970-01-01T12:00:00.000+00:00")
+
+            %>
+            startTimexxx = <%= startTime %>
+            start ms = <%= startTime.getTime() %>
+            end ms = <%= endTime.getTime() %>
+            <div> <%= cap['Start Time'].slice(0, -3) %> - <%= cap['End Time'].slice(0, -3) %></div>
+            <div>  </div>
+            <div> <%= cap['Transcript'] %> </div>
+        
+        <% }) %>
+    <% } %>
+
+    
+</div>

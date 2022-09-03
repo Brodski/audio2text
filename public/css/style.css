@@ -7,20 +7,32 @@ html {
   font-size: 24px;
 
 }
-
+.containerWide {
+  margin-left: auto;
+  margin-right: auto;
+}
 @media (max-width: 1600px) {
   .container {
     width: 60%;
+  }
+  .containerWide {
+    width: 85%;
   }
 }
 @media (max-width: 1200px) {
   .container {
     width: 70%;
   }
+  .containerWide {
+    width: 90%;
+  }
 }
 @media (max-width: 666px) {
   .container {
     width: 90%;
+  }
+  .containerWide {
+    width: 95%;
   }
 }
 

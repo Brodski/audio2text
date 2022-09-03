@@ -12,7 +12,7 @@ const cors = require("cors");
 require("dotenv").config();
 const allVids = require("../models/allVids");
 const parseString = require('xml2js').parseString;
-const FolderItemsS3 = require('../models/FolderItemsS3');
+const VidData = require('../models/VidData');
 const { S3_vid_path } = require('../models/Constantz.js');
 
 const csv = require("csvtojson");
@@ -32,13 +32,16 @@ router.get("/api/search", async (req, res) => {
     console.log("got this req.query", req.query);
     console.log("got this req.params", req.params);
 
-    let querySearch = common.processQuery(req.query.search);
+    let search = common.processQuery(req.query.search);
     // processQuery("big nasty string");
-    console.log("QUERY SEARCH FINAL =", querySearch);
+    console.log("QUERY SEARCH FINAL =", search);
     let resultzz = await Captions.aggregate([
         {
           $project: {
             title: 1,
+            csvPath: 1,
+            vidPath: 1,
+            vidTitle: 1,
             queriedCaptions: {
               $filter: {
                 input: "$captions",
@@ -47,7 +50,7 @@ router.get("/api/search", async (req, res) => {
                   "$regexMatch": {
                     "input": "$$thecaps.Transcript",
                     // "regex": "trump|New York",
-                    "regex": querySearch,
+                    "regex": search,
                     "options": "i"
                   }
                 }                
@@ -62,15 +65,17 @@ router.get("/api/search", async (req, res) => {
     console.log("resultzz")
     console.log("resultzz")
     console.log("resultzz")
-    // console.debug("%o",resultzz)
+    console.debug("%o",resultzz)
     console.log("****")
     let body = {
-        query: querySearch,
+        query: search,
         results: resultzz
     };
-    console.log(body)
     // res.send(body)
-    res.render("./transcripts/searchResults", { body } )
+    res.render("./transcripts/searchResults", {
+        search: search, 
+        results: resultzz 
+    })
     // res.render("./transcripts/blank")
 
 })
@@ -88,17 +93,17 @@ router.get("/api/search", async (req, res) => {
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 
-const saveCaptionsInDbAux = async (urlPath) => {
-    let csvUrl = process.env.CDN_DOMAIN + "/" + urlPath;
-    console.log("csvUrl=", csvUrl)
+const saveCaptionsInDbAux = async (vidData) => {
+    let csvUrl = process.env.CDN_DOMAIN + "/" + vidData.csvPath;
+    console.log("saveCaptionsInDbAux - csvUrl=", csvUrl)
 
-    // let response = await common.makeHttpRequest(csvUrl, process.env.ASSEMBLYAI_API_KEY , true)
     let response = await common.makeHttpRequest(csvUrl)
-    // console.log(response)
-    console.log(response.statusCode)
-    // console.log(response.data)
-    console.log('CSV below')
-    console.log('CSV below')
+    console.log('saveCaptionsInDbAux - CSV below')
+    console.log('saveCaptionsInDbAux - CSV below')
+    if (response?.data == null) {
+        console.log("saveCaptionsInDbAux - Something wrong with CSV")
+        return 
+    }
     let captions = await csv() //csvtojson library
     .fromString(response.data)
     .subscribe((csvObj)=>{ 
@@ -113,51 +118,49 @@ const saveCaptionsInDbAux = async (urlPath) => {
         // }
     })
     console.log("######################")
-    // console.log(captions)
-    console.log("DONE!", csvUrl)
-    // const captions = new Captions(x);
+    console.log("saveCaptionsInDbAux - DONE!", csvUrl)
+    console.log("saveCaptionsInDbAux - DONE! - viddata %o", vidData )
+    // HERE
     const captionsMongoose = new Captions({
+        ...vidData,
         captions,
-        // title: "real time with my man bill"
     });
     
-    // captionsMongoose.save().then( (result) => {
-    //     console.log("save success!.")
-    // })
-    // .catch( err => {
-    //     console.log("(My error csv) Error occured", err)
-    // })
-    console.log("FAKE SAVE!!!!!")
-    // console.log(captionsMongoose)
-    // res.json({captions} )
-    return captions;
-    // res.render('transcripts/blank')
+    captionsMongoose.save().then( (result) => {
+        console.log("saveCaptionsInDbAux - save success!.")
+    })
+    .catch( err => {
+        console.log("(My error csv) Error occured", err)
+    })
+    // console.log("%o", captionsMongoose)
+    return true;
 
 }
-
-const saveCaptionsInDb = async (everyFolderConts) => {
-    // for (let i=0; i< everyFolderConts.length; i++) {
+// vidDatas = [ {
+//     csvPath: 'vids/66/Sequence 01.csv',
+//     vidPath: 'vids/66/Plat 4 Start _ Level 1 to Challenger in 45 Days! _ Day 8 _ MENTAL GOD TIER WE CLIMB TODAY (full).mp4',
+//     vidTitle: 'Plat 4 Start _ Level 1 to Challenger in 45 Days! _ Day 8 _ MENTAL GOD TIER WE CLIMB TODAY (full)'
+//   }]
+const saveCaptionsInDb = async (vidDatas) => {
+    // for (let i=0; i< vidDatas.length; i++) {
     let count = 0;
     for (let i=0; i< 3; i++) {
-        console.log("saveCaptionsInDb - x[i].csvPath",  everyFolderConts[i].csvPath)
+        console.log("saveCaptionsInDb - x[i].csvPath",  vidDatas[i].csvPath)
         console.log("saveCaptionsInDb - CNt=", count)
         count++;
-        let result = await Captions.findOne({"csvPath": everyFolderConts[i].csvPath}).then( result =>  {
+        let result = await Captions.findOne({"csvPath": vidDatas[i].csvPath}).then( result =>  {
             console.log("saveCaptionsInDb - Checking captions")
-            console.log("saveCaptionsInDb result - " , result)
+            console.log("saveCaptionsInDb result - " , result._id)
+            console.log("saveCaptionsInDb result - " , result.id)
+            console.log("saveCaptionsInDb result - " , result.csvPath)
+            console.log("saveCaptionsInDb result - " , result.vidPath)
+            console.log("saveCaptionsInDb result - " , result.vidTitle)
+            console.log("saveCaptionsInDb result - " , result.captions?.length)
             // console.log(result?.id)
             // console.log(result?._id)
             // Check if in my Database
             if (result == null) {
-                saveCaptionsInDbAux(everyFolderConts[i].csvPath)
-                // const caps = new Captions(data);
-                // caps.save().then( (result) => {
-                //     console.log("save success!.", result)
-                // })
-                // .catch( err => {
-                //     console.log("(MongoDb error) Error occured saving ", err)
-                // })
-
+                saveCaptionsInDbAux(vidDatas[i])
             } else {
                 console.log("saveCaptionsInDb -Not saving")
             }
@@ -172,7 +175,7 @@ const saveCaptionsInDb = async (everyFolderConts) => {
 
 
 // everyFolderConts =  [
-//    FolderItemsS3 { 
+//    VidData { 
 //       csvPath: 'vids/maherTest/maherecsv.csv',
 //       vidPath: 'vids/maherTest/Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p.mp4',
 //       vidTitle: 'Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p'
@@ -196,11 +199,11 @@ const updateDbWithS3 = () => {
                     let result = await parseStringPromise(data)  // xml2js
                        .then( dt => { return dt })
                        .catch(err => { return err })
-                   let everyFolderConts = getEveryFolderContents(result)
-                   console.log("everyFolderConts")
+                   let everyVidDatas = getEveryVidDatas(result)
+                   console.log("everyVidDatas")
                    console.log("(OMITED)")
-                //    console.log(everyFolderConts)
-                   let isRecentUpdated = saveCaptionsInDb(everyFolderConts)
+                //    console.log(everyVidDatas)
+                   let isRecentUpdated = saveCaptionsInDb(everyVidDatas)
                    resolve(200);
                 }
             }).on('error', (e) => {
@@ -255,27 +258,27 @@ router.get("/cdn/allvids", async (req, res) => {
 // vids/maherTest/maherecsv.csv
 
 
-const getFolderContents = (allFolderNames, allItemsS3) => {
-
-    let allFolderConts = allFolderNames.map (folderName => { 
+const convertToVidDatas = (allFolderNames, allItemsS3) => {
+    
+    let vidDataList = allFolderNames.map (folderName => { 
         console.log("name -------------", folderName, "-------------" )
         let filt = allItemsS3.filter( s3Item => {
             // console.log("s3Item ===>", s3Item)
             return s3Item.includes(folderName)
         })
-        let folderItemsS3 = new FolderItemsS3()
+        let vidData = new VidData()
         filt.forEach( x => {
             if (x.endsWith('.csv')) {
-                folderItemsS3.csvPath = x;
+                vidData.csvPath = x;
             }
             if (x.endsWith('.mp4')) {
-                folderItemsS3.vidPath = x;
-                folderItemsS3.vidTitle = x.split('/').slice(-1)[0].replace('.mp4', '');
+                vidData.vidPath = x;
+                vidData.vidTitle = x.split('/').slice(-1)[0].replace('.mp4', '');
             }
         })
-        return folderItemsS3;
+        return vidData;
     })
-    return allFolderConts
+    return vidDataList
     
 }
 
@@ -360,7 +363,7 @@ const parseIdFromName_OLDASSEBMLY = (s3Name) => {
 
 }
 
-const getEveryFolderContents = (result) => {
+const getEveryVidDatas = (result) => {
     // 1. only grab items, not folders (folders end in '/')  
     let allItemsS3 = result?.ListBucketResult?.Contents?.filter( item => { 
         return (item.Key[0].slice(-1) != "/") 
@@ -386,11 +389,11 @@ const getEveryFolderContents = (result) => {
 
     console.log(3)
     console.log(allFolderNames)
-    let everyVidFolderConents = getFolderContents(allFolderNames, allItemsS3) // We find the intersection of the two
+    let vidDatas = convertToVidDatas(allFolderNames, allItemsS3) // We find the intersection of the two
     console.log(4)
-    console.log("4 everyVidFolderConents")
-    console.log(everyVidFolderConents)
-    return everyVidFolderConents;
+    console.log("4 vidDatas")
+    console.log(vidDatas)
+    return vidDatas;
 }
 
 module.exports = router;

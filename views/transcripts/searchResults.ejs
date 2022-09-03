@@ -1,14 +1,17 @@
 
 <%- include('../partials/head.ejs') %>
-<div class="container" id="searchResults">
+<div class="containerWide" id="searchResults">
 
-    <div> Nice </div>
-    <div>  You searched for <%= body.query %> </div>
-    <% for (let i=0; i<body.results.length; i ++)  { %>
-        <div> <%= i %> </div> 
-    <% } %>
+    <div> Search: <i> <%= search %> </i></div>
+    <!-- <div> RESULTS ALL <%= ("%o", results) %> </div> -->
     
-    <% var x = JSON.stringify(body) %>
     
+    <% results.forEach( result => {  %>
+        <%- include('./searchResults_vid.ejs', {  
+            vidTitle: result.vidTitle,     
+            vidPath: result.vidPath,   
+            queriedCaptions: result.queriedCaptions   
+        })%>
+    <% }) %>
     
 </div>

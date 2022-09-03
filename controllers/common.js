@@ -57,7 +57,7 @@ const errorHandler = (response, data) => {
 
 
 const makeHttpRequest = async (myUrl, optionz, isCsv = false) => {
-    console.log(" #" )
+    console.log(" ##########################################################" )
     console.log("---------------------------> Requesting: ", myUrl)
     console.log(" #" )
     return new Promise(function (resolve, reject) {

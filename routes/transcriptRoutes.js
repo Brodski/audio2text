@@ -36,6 +36,7 @@ router.get("/api/search", async (req, res) => {
     // processQuery("big nasty string");
     console.log("QUERY SEARCH FINAL =", search);
     let resultzz = await Captions.aggregate([
+        { $limit: 200 },
         {
           $project: {
             title: 1,
@@ -108,6 +109,9 @@ const saveCaptionsInDbAux = async (vidData) => {
     .fromString(response.data)
     .subscribe((csvObj)=>{ 
         csvObj.Transcript = csvObj.Transcript?.replace("\r", " ");
+        if (csvObj["Speaker Name"]) {
+            delete csvObj["Speaker Name"]
+        }
         // if (csvObj['Start Time']) {
         //     csvObj['Start'] = csvObj['Start Time']
         //     delete csvObj['Start Time']

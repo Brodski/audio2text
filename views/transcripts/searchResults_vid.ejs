@@ -1,38 +1,58 @@
 
 <div class="" id="searchResults_vid">
 
-    <% 
-//    let x = 1; 
-  //   let y = x +69;  
-   //  let w = 2;
-    //let q = w + y;
-    //let startTimexxx = new Date('1970-01-01T20:24:00');
-    %>
-    
-    <div>
-    </div>
-    
     <% if (queriedCaptions && queriedCaptions.length > 0) {  %>
-        <div> ------------------ </div>
-        <div> <b> <%= vidTitle %> </b></div>
-        <video controls src='<%= process.env.CDN_DOMAIN + "/" + vidPath.replaceAll(" ", "+") %>'></video>
-        <div>  queriedCaptions.length <%= queriedCaptions.length %> </div>
-        <div>  queriedCaptions.length <%= queriedCaptions %> </div>
-        <% queriedCaptions.forEach( cap => { %>
+        <% let vidSrc = process.env.CDN_DOMAIN + "/" + vidPath?.replaceAll(" ", "+") %>
+        <div>
+            <div> ------------------ </div>
+            <div> <b> <%= vidTitle %> </b></div>
+            <div>  <%= queriedCaptions.length %> results at this video </div>
+            <div> <i> <%= vidSrc %> </i></div>
+            <video id="" controls src='<%= vidSrc %>'></video>
+        </div>
+        <!-- <div>  queriedCaptions <%- JSON.stringify(queriedCaptions) %>  -->
+        <% queriedCaptions.forEach( (cap, i) => { %>
             <% 
-                let start = "" + cap['Start Time'].slice(0, -3); 
-                let end = "" + cap['End Time'].slice(0, -3); 
-                let startTime = new Date('1970-01-01T' + start + ".000+00:00");
-                let endTime = new Date('1970-01-01T' + end + ".000+00:00");
-            //  xxx = new Date("1970-01-01T12:00:00.000+00:00")
-
+                let start = cap['Start Time'].slice(0, -3); 
+                let end =  cap['End Time'].slice(0, -3); 
+                let startTime = new Date('1970-01-01T' + start + ".000+00:00").getTime() / 1000;
+                let endTime = new Date('1970-01-01T' + end + ".000+00:00").getTime() / 1000;
+                let fnName = "playAtClip" + Math.floor(Math.random() * 100000)
             %>
-            startTimexxx = <%= startTime %>
-            start ms = <%= startTime.getTime() %>
-            end ms = <%= endTime.getTime() %>
-            <div> <%= cap['Start Time'].slice(0, -3) %> - <%= cap['End Time'].slice(0, -3) %></div>
-            <div>  </div>
-            <div> <%= cap['Transcript'] %> </div>
+            <%# https://developer.chrome.com/blog/play-request-was-interrupted/ #%>
+            <!-- sub-optimal hacky code below. -->
+            <script>
+                    function <%= fnName %>() {
+                        let vid = document.querySelector('video[src="<%= vidSrc %>"');
+                        console.log(vid);
+                        vid.currentTime =  "<%= startTime %>"
+                        let playPromise = vid.play();
+    
+                        if (playPromise !== undefined) {
+                            playPromise.then(_ => {
+                                // Automatic playback started! Show playing UI. We can now safely pause video...
+                                video.pause();
+                            })
+                            .catch(error => {
+                                // Auto-play was prevented. Show paused UI.
+                            });
+                        }
+                    }
+            </script>
+            <div class="searchResults_t_info">
+                <div class="searchResults_subtitle">
+                    <span class="searchResults_counter"> <%= i + 1 %> </span>
+                    <span class="play_icon" onclick="<%= fnName %>()"> <span> ▶ </span> </span>
+                </div>
+
+                <!-- <span class="play_icon"> 	▸</span> -->
+
+
+                <!-- <div> start sec = <%= startTime %></div>
+                <div> end sec = <%= endTime %> </div> -->
+                <div> <%= start %> - <%= end %></div>
+                <div> <%= cap['Transcript'] %> </div>
+            </div>
         
         <% }) %>
     <% } %>

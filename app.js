@@ -18,6 +18,10 @@ const dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/
 mongoose.connect(dbUri)
   .then((result) => {
     console.log("Connected to mongoose DB, gogoogogoo");
+    var admin = new mongoose.mongo.Admin(mongoose.connection.db);
+    admin.buildInfo(function (err, info) {
+       console.log("Mongodb version: ", info.version);
+    });
   })
   .catch( err => {
     console.log('Error', err)

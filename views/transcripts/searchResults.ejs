@@ -5,7 +5,7 @@
 <div class="containerWide" id="searchResults">
 
     <div> Search: <i> <%= search %> </i></div>
-    <!-- <div> RESULTS ALL <%= ("%o", results) %> </div> -->
+    <div> RESULTS ALL <%= ("%o", results) %> </div>
     
     <% results.forEach( result => {  %>
         <%- include('./searchResults_vid.ejs', {  

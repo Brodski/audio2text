@@ -17,7 +17,7 @@ const { S3_vid_path } = require('../models/Constantz.js');
 const csv = require("csvtojson");
 const { parseStringPromise } = require('xml2js');
 
-
+var ObjectId = require('mongoose').Types.ObjectId; 
 
 // https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences
 
@@ -27,6 +27,42 @@ router.get("/search", async (req, res) => {
     res.render("transcripts/search")
 })
 
+// Returns the Vod and just the single clip
+router.get("/api/clip/:id", async (req, res) => {
+    console.log('req.params', req.params)
+    const id = req.params.id
+    let clip = await Captions.find( 
+        {"clips._id" : ObjectId(id) },
+        {
+              title: 1,
+              csvPath: 1,
+              vidPath: 1,
+              vidTitle: 1,
+              queriedCaptions: {
+                $filter: {  
+                  input: "$clips",
+                  as: "theclips",
+                  cond: {
+                    "$eq": ["$$theclips._id", ObjectId(id) ]
+                  },
+                }
+              }
+          }
+    ).then( result => {
+        console.log("result", result)
+        
+        // res.send( result)
+        return result
+    })
+    .catch(err => {
+        res.status(404).redirect('/404.html')
+    })
+
+    res.render("./transcripts/searchResults", {
+        search: id, 
+        results: clip 
+    })
+})
 router.get("/api/search", async (req, res) => {
     console.log("got this req.query", req.query);
     console.log("got this req.params", req.params);
@@ -34,47 +70,48 @@ router.get("/api/search", async (req, res) => {
     let search = common.processQuery(req.query.search);
     // processQuery("big nasty string");
     console.log("QUERY SEARCH FINAL =", search);
-    let resultzz = await Captions.aggregate([
-        { $limit: 200 },
+    let searchResults = await Captions.aggregate([
+        { $limit: 100 },
         {
-          $project: {
-            title: 1,
-            csvPath: 1,
-            vidPath: 1,
-            vidTitle: 1,
-            queriedCaptions: {
-              $filter: {
-                input: "$captions",
-                as: "thecaps",
-                cond: {
-                  "$regexMatch": {
-                    "input": "$$thecaps.Transcript",
-                    // "regex": "trump|New York",
-                    "regex": search,
-                    "options": "i"
-                  }
-                }                
+            $project: {
+              title: 1,
+              csvPath: 1,
+              vidPath: 1,
+              vidTitle: 1,
+              queriedCaptions: {
+                $filter: {  
+                  input: "$clips",
+                  as: "theclips",
+                  cond: {
+                    "$regexMatch": {
+                      "input": "$$theclips.Transcript",
+                      // "regex": "trump|New York",
+                      "regex": search,
+                      "options": "i"
+                    }
+                  },
+                //   $limit: 2, AVAILABLE IN MONGO VERISON 6 (have to pay :(  
+                }
               }
             }
-          }
-        }        
-    ]).then ( rez => { 
-        return rez;
+          }    
+    ]).then( rez => {
+        return rez
     })
-    console.log("resultzz")
-    console.log("resultzz")
-    console.log("resultzz")
-    console.log("resultzz")
-    console.debug("%o",resultzz)
+    console.log("searchResults")
+    console.log("searchResults")
+    console.log("searchResults")
+    console.log("searchResults")
+    console.debug("%o",searchResults)
     console.log("****")
     let body = {
         query: search,
-        results: resultzz
+        results: searchResults
     };
     // res.send(body)
     res.render("./transcripts/searchResults", {
         search: search, 
-        results: resultzz 
+        results: searchResults 
     })
     // res.render("./transcripts/blank")
 
@@ -113,9 +150,9 @@ const saveCaptionsInDbAux = async (vidData) => {
             delete csvObj["Speaker Name"]
         }
         let clip = new Clip (csvObj)
-        console.log( "saveCaptionsInDbAux - saving .....")
-        await clip.save()
-        console.log( "saveCaptionsInDbAux - save complete!")
+        clips.push(clip);
+        // clip.save()
+
         // if (csvObj['Start Time']) {
         //     csvObj['Start'] = csvObj['Start Time']
         //     delete csvObj['Start Time']
@@ -131,7 +168,8 @@ const saveCaptionsInDbAux = async (vidData) => {
     // HERE
     const captionsMongoose = new Captions({
         ...vidData,
-        captions,
+        clips
+        // captions,
     });
     
     captionsMongoose.save().then( (result) => {

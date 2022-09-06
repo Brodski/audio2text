@@ -28,6 +28,22 @@ router.get("/search", async (req, res) => {
 })
 
 // Returns the Vod and just the single clip
+router.get("/vods/all", async (req, res) => {
+
+    let clip = await Captions.find( {}, {
+            title: 1,
+            csvPath: 1,
+            vidPath: 1,
+            vidTitle: 1,
+        }
+    ).then( result => {
+        console.log("result", result)
+        return result
+    })
+    res.send(clip)
+})
+
+
 router.get("/clip/:id", async (req, res) => {
     console.log('req.params', req.params)
     const id = req.params.id
@@ -109,16 +125,7 @@ router.get("/api/search", async (req, res) => {
                 console.log("ownArr")
                 console.log(ownArr)
             // console.log('%o', clip)
-            let xxx = clip.Transcript.replace(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
-            clip.Transcript = xxx
-            // ownArr[i] = xxx
-            // let xxx = clip.Transcript.replace(re, `!!!!!!!!!!!!!!!!!!!`) // syntax stuff for "OR"
-            // console.log("xxxxxxxxxxxxxx")
-            // console.log("xxxxxxxxxxxxxx")
-            // console.log("xxxxxxxxxxxxxx")
-            // console.log("xxxxxxxxxxxxxx")
-            // console.log(xxx)
-            // return xxx
+            clip.Transcript = clip.Transcript.replaceAll(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
             })
         })
         console.log("POST rez")

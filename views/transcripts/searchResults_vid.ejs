@@ -2,6 +2,9 @@
 <div class="" id="searchResults_vid">
 
     <% if (queriedCaptions && queriedCaptions.length > 0) {  %>
+        <script>
+            console.log("<%= queriedCaptions %>")
+        </script>
         <% let vidSrc = process.env.CDN_DOMAIN + "/" + vidPath?.replaceAll(" ", "+") %>
         <div>
             <div> ------------------ </div>
@@ -31,6 +34,8 @@
 
                 <!-- <div> start sec = <%= startTime %></div>
                 <div> end sec = <%= endTime %> </div> -->
+                <div> id <%= cap.id %></div>
+                <div> id <%= cap._id %></div>
                 <div> <%= start %> - <%= end %></div>
                 <div> <%= cap['Transcript'] %> </div>
             </div>

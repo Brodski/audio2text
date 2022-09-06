@@ -7,7 +7,7 @@
         </script>
         <% let vidSrc = process.env.CDN_DOMAIN + "/" + vidPath?.replaceAll(" ", "+") %>
         <div>
-            <div> ------------------ </div>
+            <hr>
             <div> <b> <%= vidTitle %> </b></div>
             <div>  <%= queriedCaptions.length %> results at this video </div>
             <div> <i> <%= vidSrc %> </i></div>
@@ -34,10 +34,9 @@
 
                 <!-- <div> start sec = <%= startTime %></div>
                 <div> end sec = <%= endTime %> </div> -->
-                <div> id <%= cap.id %></div>
-                <div> id <%= cap._id %></div>
+                <div> link: <a href="/clip/<%= cap._id %>"> <%= cap._id %> </a></div>
                 <div> <%= start %> - <%= end %></div>
-                <div> <%= cap['Transcript'] %> </div>
+                <div> <%- cap['Transcript'] %> </div>
             </div>
         
         <% }) %>

@@ -28,7 +28,7 @@ router.get("/search", async (req, res) => {
 })
 
 // Returns the Vod and just the single clip
-router.get("/api/clip/:id", async (req, res) => {
+router.get("/clip/:id", async (req, res) => {
     console.log('req.params', req.params)
     const id = req.params.id
     let clip = await Captions.find( 
@@ -96,6 +96,44 @@ router.get("/api/search", async (req, res) => {
             }
           }    
     ]).then( rez => {
+        var replace = `\\b${search}\\b`;
+        var re = new RegExp(replace,"gmi");
+        console.log("rez")
+        console.log("rez")
+        console.log("rez")
+        console.log("rez")
+        console.log(rez)
+        rez.forEach( vodAndClips => {
+            vodAndClips.queriedCaptions.forEach( (clip, i, ownArr) => {
+                // clip.Transcript.re
+                console.log("ownArr")
+                console.log(ownArr)
+            // console.log('%o', clip)
+            let xxx = clip.Transcript.replace(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
+            clip.Transcript = xxx
+            // ownArr[i] = xxx
+            // let xxx = clip.Transcript.replace(re, `!!!!!!!!!!!!!!!!!!!`) // syntax stuff for "OR"
+            // console.log("xxxxxxxxxxxxxx")
+            // console.log("xxxxxxxxxxxxxx")
+            // console.log("xxxxxxxxxxxxxx")
+            // console.log("xxxxxxxxxxxxxx")
+            // console.log(xxx)
+            // return xxx
+            })
+        })
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("POST rez")
+        console.log("%o",rez)
         return rez
     })
     console.log("searchResults")
@@ -151,15 +189,10 @@ const saveCaptionsInDbAux = async (vidData) => {
         }
         let clip = new Clip (csvObj)
         clips.push(clip);
-        // clip.save()
 
         // if (csvObj['Start Time']) {
         //     csvObj['Start'] = csvObj['Start Time']
         //     delete csvObj['Start Time']
-        // }
-        // if (csvObj['End Time']) {
-        //     csvObj['End'] = csvObj['End Time']
-        //     delete csvObj['End Time']
         // }
     })
     console.log("######################")

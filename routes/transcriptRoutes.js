@@ -3,10 +3,9 @@ const express = require('express');
 const https = require('https');
 const router = express.Router();
 const blogController = require("../controllers/blogController");
-const { Transcript } = require('../models/transcript');
-const { TranscriptParagraphs } = require('../models/transcript');
+
 const { Captions } = require('../models/captions');
-const { Captions2 } = require('../models/captions');
+const { Clip } = require('../models/captions');
 const common = require('../controllers/common.js');
 const cors = require("cors");
 require("dotenv").config();
@@ -105,13 +104,18 @@ const saveCaptionsInDbAux = async (vidData) => {
         console.log("saveCaptionsInDbAux - Something wrong with CSV")
         return 
     }
+    let clips = []
     let captions = await csv() //csvtojson library
     .fromString(response.data)
-    .subscribe((csvObj)=>{ 
+    .subscribe(async (csvObj)=>{ 
         csvObj.Transcript = csvObj.Transcript?.replace("\r", " ");
         if (csvObj["Speaker Name"]) {
             delete csvObj["Speaker Name"]
         }
+        let clip = new Clip (csvObj)
+        console.log( "saveCaptionsInDbAux - saving .....")
+        await clip.save()
+        console.log( "saveCaptionsInDbAux - save complete!")
         // if (csvObj['Start Time']) {
         //     csvObj['Start'] = csvObj['Start Time']
         //     delete csvObj['Start Time']
@@ -149,17 +153,17 @@ const saveCaptionsInDb = async (vidDatas) => {
     // for (let i=0; i< vidDatas.length; i++) {
     let count = 0;
     for (let i=0; i< 3; i++) {
-        console.log("saveCaptionsInDb - x[i].csvPath",  vidDatas[i].csvPath)
-        console.log("saveCaptionsInDb - CNt=", count)
+        console.log(`saveCaptionsInDb - ${i} csv`,  vidDatas[i].csvPath)
+        console.log("saveCaptionsInDb - count=", count)
         count++;
         let result = await Captions.findOne({"csvPath": vidDatas[i].csvPath}).then( result =>  {
             console.log("saveCaptionsInDb - Checking captions")
-            console.log("saveCaptionsInDb result - " , result._id)
-            console.log("saveCaptionsInDb result - " , result.id)
-            console.log("saveCaptionsInDb result - " , result.csvPath)
-            console.log("saveCaptionsInDb result - " , result.vidPath)
-            console.log("saveCaptionsInDb result - " , result.vidTitle)
-            console.log("saveCaptionsInDb result - " , result.captions?.length)
+            console.log("saveCaptionsInDb result - " , result?._id)
+            console.log("saveCaptionsInDb result - " , result?.id)
+            console.log("saveCaptionsInDb result - " , result?.csvPath)
+            console.log("saveCaptionsInDb result - " , result?.vidPath)
+            console.log("saveCaptionsInDb result - " , result?.vidTitle)
+            console.log("saveCaptionsInDb result - " , result?.captions?.length)
             // console.log(result?.id)
             // console.log(result?._id)
             // Check if in my Database
@@ -203,10 +207,14 @@ const updateDbWithS3 = () => {
                     let result = await parseStringPromise(data)  // xml2js
                        .then( dt => { return dt })
                        .catch(err => { return err })
-                   let everyVidDatas = getEveryVidDatas(result)
+                   let everyVidDatas = getEveryVidDatas(result) // list of vid with my custom fields. (vidPath, vidTittle, vidCsv)
                    console.log("everyVidDatas")
                    console.log("(OMITED)")
-                //    console.log(everyVidDatas)
+                   console.log(everyVidDatas)
+                // HERE
+                // HERE
+                // HERE
+                // HERE we want to seperate this save function
                    let isRecentUpdated = saveCaptionsInDb(everyVidDatas)
                    resolve(200);
                 }

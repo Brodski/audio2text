@@ -4,6 +4,14 @@
     border-radius: 4px;
     cursor: pointer;
 }
+.play_icon:hover,
+.play_icon:hover span {
+    border-color: inherit;
+    color: mediumblue;
+}
+.play_icon:hover {
+    box-shadow: 0 0 3px white;
+}
 .play_icon > span {
     margin-left: 4px;
     margin-right: 3px;

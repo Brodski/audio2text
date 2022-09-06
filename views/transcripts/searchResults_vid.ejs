@@ -17,32 +17,13 @@
                 let end =  cap['End Time'].slice(0, -3); 
                 let startTime = new Date('1970-01-01T' + start + ".000+00:00").getTime() / 1000;
                 let endTime = new Date('1970-01-01T' + end + ".000+00:00").getTime() / 1000;
-                let fnName = "playAtClip" + Math.floor(Math.random() * 100000)
+                // let fnName = "playAtClip" + Math.floor(Math.random() * 100000)
             %>
             <%# https://developer.chrome.com/blog/play-request-was-interrupted/ #%>
-            <!-- sub-optimal hacky code below. -->
-            <script>
-                    function <%= fnName %>() {
-                        let vid = document.querySelector('video[src="<%= vidSrc %>"');
-                        console.log(vid);
-                        vid.currentTime =  "<%= startTime %>"
-                        let playPromise = vid.play();
-    
-                        if (playPromise !== undefined) {
-                            playPromise.then(_ => {
-                                // Automatic playback started! Show playing UI. We can now safely pause video...
-                                video.pause();
-                            })
-                            .catch(error => {
-                                // Auto-play was prevented. Show paused UI.
-                            });
-                        }
-                    }
-            </script>
             <div class="searchResults_t_info">
                 <div class="searchResults_subtitle">
                     <span class="searchResults_counter"> <%= i + 1 %> </span>
-                    <span class="play_icon" onclick="<%= fnName %>()"> <span> ▶ </span> </span>
+                    <span class="play_icon" onclick="playClip(document.querySelector(`video[src='<%= vidSrc %>'`), '<%= startTime %>' )"> <span> ▶ </span> </span>
                 </div>
 
                 <!-- <span class="play_icon"> 	▸</span> -->

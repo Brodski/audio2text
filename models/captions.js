@@ -17,16 +17,26 @@ const captionsSchema = new Schema({
   // _id: {auto: true}
 });
 
+const VodSchema = new Schema([{
+  "CsvPath": String,
+  "vidPath": String,
+  "vidTitle": String,
+  "Clips": [{type: Schema.Types.ObjectId, ref: "Clips"}]
+  },  { 
+  strict: false
+}]);
 
 
-const captionsSchema2 = new Schema([{
+const ClipSchema = new Schema([{
   "Start Time": String,
   "End Time": String,
   "Transcript": String,
+  "Vod": {type: Schema.Types.ObjectId, ref: "Vod"}
   },  { 
   strict: false
 }]);
 
 const Captions = mongoose.model('Captions', captionsSchema);
-const Captions2 = mongoose.model('Captions2', captionsSchema2);
-module.exports = { Captions, Captions2 };
+const Vod = mongoose.model('Vod', VodSchema);
+const Clip = mongoose.model('Clip', ClipSchema);
+module.exports = { Captions, Vod, Clip };

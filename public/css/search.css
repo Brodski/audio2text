@@ -56,6 +56,7 @@
 
 .play_icon {
     border: 2px solid gray;
+    background-color: black;
     border-radius: 4px;
     cursor: pointer;
     height: 100%;
@@ -80,8 +81,6 @@
     background-color: darkmagenta;
 }
 
-
-
 @media (min-width: 900px ) {
     .searchResults video {
         /* width: auto;
@@ -105,7 +104,13 @@
 .searchResults_clips {
     position: relative;
     height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
+}
+
+.searchResults_single_clip_link {
+    /* margin-left: auto;
+    margin-right: 22px; */
+    margin-left: 18px;
 }
 
 .bottom_icon {
@@ -113,8 +118,6 @@
     display: flex;
     top: 98vh;
     height: auto;
-    /* width: 400px; */
-    /* border: 6px solid red; */
     transform: translateY(-100%);
 }
 
@@ -138,6 +141,7 @@
 .searchResults_subtitle {
     padding-top: 12px;
     display: flex;
+    align-items: center;
 }
 .searchResults_counter {
     font-weight: 600;

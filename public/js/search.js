@@ -8,8 +8,45 @@ class Clip {
         console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     }
-    play() {
+}
+
+
+console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+window.addEventListener('load', e => {
+    let clipsContainer = document.querySelectorAll(".searchResults_clips");
+    console.log('loaded', clipsContainer)
+    for (let i=0; i<clipsContainer.length; i++) {
+        console.log('clipsContainer[i]', clipsContainer[i])
+        setUpScroll(clipsContainer[i])
     }
+})
+
+const setUpScrollAux = (clipsContainer) => {
+    console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
+    console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
+    console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 40)
+    if (document.readyState == "complete" && Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)  { 
+        let moreIcon = clipsContainer.querySelector('.bottom_icon');
+        if ( moreIcon) { moreIcon.style.display = "none"; }
+    }
+    return true
+}
+
+function setUpScroll(clipsContainer) {
+    console.log('setting up on', clipsContainer)
+    // let clipsContainer = e.target;
+    // clipsContainer.scrollHeight //total possible distance
+    // clipsContainer.scrollTop // current distance (0 at top)
+    // clipsContainer.clientHeight // visible content on screen 
+
+    setUpScrollAux(clipsContainer);
+    clipsContainer.addEventListener('scroll', e => {
+        setUpScrollAux(clipsContainer);
+    })
 }
 
 function playClip(vid, startTime) {
@@ -36,7 +73,8 @@ function isAtBottom(e) {
     clipsContainer.scrollHeight //total possible distance
     clipsContainer.scrollTop // current distance (0 at top)
     clipsContainer.clientHeight // visible content on screen 
-    console.log("window load", document.readyState)
+    console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
+    console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
     console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)
     if (document.readyState == "complete" && Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)  { 
         let moreIcon = e.target.querySelector('.bottom_icon');

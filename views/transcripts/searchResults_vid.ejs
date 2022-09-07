@@ -1,31 +1,33 @@
 
-<% let vidSrc = process.env.CDN_DOMAIN + "/" + vidPath?.replaceAll(" ", "+") %>
+<% let vidSrc = process.env.CDN_DOMAIN + "/" + vidAndClips.vidPath?.replaceAll(" ", "+") %>
 <div class="searchResults_wrap">
     <div class="searchResults_vid" >
-        <div> <b> <%= vidTitle %> </b></div>
-        <div>  <%= queriedCaptions.length %> results </div>
-        <video id="" controls src='<%= vidSrc %>'></video>
+        <div> <b> <%= vidAndClips.vidTitle %> </b></div>
+        <div>  <%= vidAndClips.clips.length %> results </div>
+        <video id="<%= vidAndClips._id %>" controls src='<%= vidSrc %>'></video>
     </div>
-    <div class="searchResults_clips" onscroll="isAtBottom(event)"> 
+    <div class="searchResults_clips" onscroll="isAtBottom(event)" >
         <div class="bottom_icon"> 
             <span> ˅ </span>
         </div>
-        <% queriedCaptions.forEach( (cap, i) => { %>
+        <% vidAndClips.clips.forEach( (clip, i) => { %>
             <% 
-                let start = cap['Start Time']?.slice(0, -3); 
-                let end =  cap['End Time']?.slice(0, -3); 
+                let start = clip['Start Time']?.slice(0, -3); 
+                let end =  clip['End Time']?.slice(0, -3); 
                 let startTime = new Date('1970-01-01T' + start + ".000+00:00").getTime() / 1000;
                 let endTime = new Date('1970-01-01T' + end + ".000+00:00").getTime() / 1000;
             %>
             <%# https://developer.chrome.com/blog/play-request-was-interrupted/ #%>
-            <div class="searchResults_t_info">
+
+            
+            <div class="searchResults_t_info" id="<%= clip._id %>">
                 <div class="searchResults_subtitle">
                     <span class="searchResults_counter"> <%= i + 1 %> </span>
                     <span class="play_icon" onclick="playClip(document.querySelector(`video[src='<%= vidSrc %>'`), '<%= startTime %>' )"> <span> ▶ </span> </span>
+                    <div class="searchResults_single_clip_link"> <a href="/clip/<%= clip._id %>"> link </a></div>
                 </div>
-                <div> link: <a href="/clip/<%= cap._id %>"> <%= cap._id %> </a></div>
                 <div> <%= start %> - <%= end %></div>
-                <div> <%- cap['Transcript'] %> </div>
+                <div> <%- clip['Transcript'] %> </div>
             </div>
         <% }) %>
     </div>

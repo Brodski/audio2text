@@ -16,8 +16,9 @@
     <% results.forEach( result => {  %>
         <% if (result.clips && result.clips.length > 0) {  %>
             <hr>
-            <div>result._id <a href="/vods/<%= result._id %>" > <%= result._id %> </a></div>
+            <div> <a href="/vods/<%= result._id %>"> Full Vod link </a></div>
             <%- include('./searchResults_vid.ejs', {  
+                vidAndClips: result,
                 vidTitle: result.vidTitle,     
                 vidPath: result.vidPath,   
                 queriedCaptions: result.clips   

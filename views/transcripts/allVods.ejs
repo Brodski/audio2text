@@ -3,11 +3,10 @@
 <link rel="stylesheet" href="/css/search.css" type="text/css">
 <div class="containerWide searchResults">
 
-    <div> Search: <i> <%= vods %> </i></div>
+    <!-- <div> Search: <i> <%= vods %> </i></div> -->
     <div>
         <% vods.forEach( vod => { %>
             <% let vidSrc = process.env.CDN_DOMAIN + "/" + vod.vidPath?.replaceAll(" ", "+") %>
-            <div> <%= vod.vidTitle %> </div>
             <a href="/vods/<%= vod.id %>">  <%= vod.vidTitle %> </a>
             <!-- <div> <%= vod %> </div> -->
         <% }) %>

@@ -31,7 +31,6 @@ router.get("/search", async (req, res) => {
 router.get("/vods/all", async (req, res) => {
 
     let vods = await Captions.find( {}, {
-            id: 1,
             _id: 1,
             title: 1,
             csvPath: 1,
@@ -231,7 +230,7 @@ const saveCaptionsInDbAux = async (vidData) => {
 const saveCaptionsInDb = async (vidDatas) => {
     // for (let i=0; i< vidDatas.length; i++) {
     let count = 0;
-    for (let i=0; i< 3; i++) {
+    for (let i=0; i< 10; i++) {
         console.log(`saveCaptionsInDb - ${i} csv`,  vidDatas[i].csvPath)
         console.log("saveCaptionsInDb - count=", count)
         count++;

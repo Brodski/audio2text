@@ -35,7 +35,7 @@ const ClipSchema = new Schema([{
   },  { 
   strict: false
 }]);
-
+VodSchema.set('timestamps', true)
 const Captions = mongoose.model('Captions', captionsSchema);
 const Vod = mongoose.model('Vod', VodSchema);
 const Clip = mongoose.model('Clip', ClipSchema);

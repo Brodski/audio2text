@@ -1,0 +1,14 @@
+
+<%- include('../partials/head.ejs') %>
+<link rel="stylesheet" href="/css/search.css" type="text/css">
+<div class="containerWide" id="searchResultsxxxxxxx">
+
+    <!-- <div> Search: <i> <%= vod %> </i></div> -->
+    <div>
+        <% let vidSrc = process.env.CDN_DOMAIN + "/" + vod.vidPath?.replaceAll(" ", "+") %>
+        <div> <%= vod.vidTitle %> </div>
+        <a href="/vods/<%= vod.id %>">  <%= vod.vidTitle %> </a>
+        <!-- <div> <%= vod %> </div> -->
+        
+    </div>
+</div>

@@ -2,24 +2,27 @@
 <%- include('../partials/head.ejs') %>
 <link rel="stylesheet" href="/css/search.css" type="text/css">
 <script type="text/javascript" src="/js/search.js"></script>
-<div class="containerWide" id="searchResults">
-
-    <div> Search: <i> <%= search %> </i></div>
-    <!-- <div> RESULTS ALL <%= ("%o", results) %> </div> -->
+<div class="containerWide searchResults">
     <% 
         let counter = 0;
         results.forEach( result => {  
-            counter += result.queriedCaptions.length;
+            counter += result.clips.length;
         })
     %>
-    <div> Total results: <%= counter %> </div>
-    
+    <div class="searchResult_heading">
+        <h2> Search: <i> <%= search %> </i></h2>
+        <h3> Total results: <%= counter %> </h3>
+    </div>
     <% results.forEach( result => {  %>
-        <%- include('./searchResults_vid.ejs', {  
-            vidTitle: result.vidTitle,     
-            vidPath: result.vidPath,   
-            queriedCaptions: result.queriedCaptions   
-        })%>
+        <% if (result.clips && result.clips.length > 0) {  %>
+            <hr>
+            <div>result._id <a href="/vods/<%= result._id %>" > <%= result._id %> </a></div>
+            <%- include('./searchResults_vid.ejs', {  
+                vidTitle: result.vidTitle,     
+                vidPath: result.vidPath,   
+                queriedCaptions: result.clips   
+            })%>
+      <% } %>
     <% }) %>
     
 </div>

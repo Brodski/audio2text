@@ -30,7 +30,9 @@ router.get("/search", async (req, res) => {
 // Returns the Vod and just the single clip
 router.get("/vods/all", async (req, res) => {
 
-    let clip = await Captions.find( {}, {
+    let vods = await Captions.find( {}, {
+            id: 1,
+            _id: 1,
             title: 1,
             csvPath: 1,
             vidPath: 1,
@@ -40,9 +42,28 @@ router.get("/vods/all", async (req, res) => {
         console.log("result", result)
         return result
     })
-    res.send(clip)
+    res.render("./transcripts/allVods", {vods})
+    // res.send(clip)
 })
 
+router.get("/vods/:id", async (req, res) => {
+    console.log('req.params', req.params)
+    const id = req.params.id
+
+    let vod = await Captions.findById(id)
+        .then( result => {
+            console.log("result", result)
+            return result
+    })
+    console.log({vod})
+    // res.render("./transcripts/vod", {vod})
+
+    res.render("./transcripts/searchResults", {
+        search: id, 
+        results: [vod]
+    })
+    // res.send([ vod])
+})
 
 router.get("/clip/:id", async (req, res) => {
     console.log('req.params', req.params)
@@ -54,7 +75,7 @@ router.get("/clip/:id", async (req, res) => {
               csvPath: 1,
               vidPath: 1,
               vidTitle: 1,
-              queriedCaptions: {
+              clips: {
                 $filter: {  
                   input: "$clips",
                   as: "theclips",
@@ -90,11 +111,13 @@ router.get("/api/search", async (req, res) => {
         { $limit: 100 },
         {
             $project: {
+              _id: 1,
               title: 1,
               csvPath: 1,
               vidPath: 1,
               vidTitle: 1,
-              queriedCaptions: {
+            //   queriedCaptions: {
+              clips: {
                 $filter: {  
                   input: "$clips",
                   as: "theclips",
@@ -114,33 +137,11 @@ router.get("/api/search", async (req, res) => {
     ]).then( rez => {
         var replace = `\\b${search}\\b`;
         var re = new RegExp(replace,"gmi");
-        console.log("rez")
-        console.log("rez")
-        console.log("rez")
-        console.log("rez")
-        console.log(rez)
         rez.forEach( vodAndClips => {
-            vodAndClips.queriedCaptions.forEach( (clip, i, ownArr) => {
-                // clip.Transcript.re
-                console.log("ownArr")
-                console.log(ownArr)
-            // console.log('%o', clip)
+            vodAndClips.clips.forEach( (clip, i, ownArr) => {
             clip.Transcript = clip.Transcript.replaceAll(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
             })
         })
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("POST rez")
-        console.log("%o",rez)
         return rez
     })
     console.log("searchResults")

@@ -15,11 +15,11 @@ const processQuery = (querySearch) => {
     console.log(querySearch)
     querySearch = querySearch.trim()
     console.log("q0", querySearch)
-    querySearch = querySearch.replace(/\sOR\s/gmi, '|') // syntax stuff for "OR"
+    querySearch = querySearch.replaceAll(/\sOR\s/gmi, '|') // syntax stuff for "OR"
     console.log("q1", querySearch)
-    querySearch = querySearch.replace(/[^a-zA-Z\s|']/gmi, '') // shitty sanatize, remove all goofy characters and symbols
+    querySearch = querySearch.replaceAll(/[^a-zA-Z\s|']/gmi, '') // shitty sanatize, remove all goofy characters and symbols
     console.log("q2", querySearch)
-    querySearch = querySearch.replace(/\s+/gmi, ' ') // replace multiple spaces with just 1 space, eg) "more    money"=> "more money"
+    querySearch = querySearch.replaceAll(/\s+/gmi, ' ') // replace multiple spaces with just 1 space, eg) "more    money"=> "more money"
     console.log("q3", querySearch)
     // querySearch = querySearch.replace(/\s/gmi, '|') // replace spaces with OR operator, eg) "chall dog rich" => "chall|dog|rich"
     // console.log("q4", querySearch)

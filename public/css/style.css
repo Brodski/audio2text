@@ -11,6 +11,7 @@ html {
 .containerWide {
   margin-left: auto;
   margin-right: auto;
+  max-width: 1800px;
 }
 
 a[href] {
@@ -19,18 +20,18 @@ a[href] {
 
 @media (max-width: 1600px) {
   .container {
-    width: 60%;
+    /* width: 60%; */
   }
   .containerWide {
-    width: 85%;
+    /* width: 85%; */
   }
 }
 @media (max-width: 1200px) {
   .container {
-    width: 70%;
+    /* width: 70%; */
   }
   .containerWide {
-    width: 90%;
+    /* width: 90%; */
   }
 }
 @media (max-width: 666px) {
@@ -58,37 +59,4 @@ input {
   border-radius: 6px;
   width: 100%;
   margin: 12px 0 12px 0;
-}
-
-#search input {
-}
-
-#search h3 {
-  padding-bottom: 8px;
-
-}
-
-#search {
-  /* margin: 0 16px 0 16px; */
-  margin: 0 auto 0 auto;
-
-}
-#search #main {
-  border-radius: 16px;
-  /* width: 500px; */
-  border: 1px solid;
-  padding: 50 50 50 50;
-  margin: 100 0 80 0;
-}
-
-#search p,
-#search span {
-  font-size: 1rem;
-}
-#search .search_ex {
-  padding-left: 0;
-}
-
-#search .search_hint {
-  font-weight: 600;
 }

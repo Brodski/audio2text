@@ -1,9 +1,65 @@
 
+#search input {
+}
+
+#search h3 {
+  padding-bottom: 8px;
+
+}
+
+#search {
+  /* margin: 0 16px 0 16px; */
+  margin: 0 auto 0 auto;
+
+}
+#search #main {
+  border-radius: 16px;
+  /* width: 500px; */
+  border: 1px solid;
+  padding: 50 50 50 50;
+  margin: 100 0 80 0;
+}
+
+#search p,
+#search span {
+  font-size: 1rem;
+}
+#search .search_ex {
+  padding-left: 0;
+}
+
+#search .search_hint {
+  font-weight: 600;
+}
+.searchResult_heading {
+    padding: 20px 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .play_icon {
     border: 2px solid gray;
     border-radius: 4px;
     cursor: pointer;
-    background-image:   url('../../TriangleArrow-Right.svg');
+    height: 100%;
+    align-self: center;
 }
 .play_icon:hover,
 .play_icon:hover span {
@@ -24,17 +80,55 @@
     background-color: darkmagenta;
 }
 
-@media (min-width: 1200px ) {
-    #searchResults_vid video {
-        width: auto;
-        height: 400;
-    }
-}
-@media (max-width: 1199px ) {
-    #searchResults_vid video {
+
+
+@media (min-width: 900px ) {
+    .searchResults video {
+        /* width: auto;
+        height: 400; */
         width: 100%;
         height: auto;
     }
+    .searchResults_wrap {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        grid-gap: 6px;
+    }
+}
+@media (max-width: 899px ) {
+    .searchResults video {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.searchResults_clips {
+    position: relative;
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+.bottom_icon {
+    position: sticky;
+    display: flex;
+    top: 98vh;
+    height: auto;
+    /* width: 400px; */
+    /* border: 6px solid red; */
+    transform: translateY(-100%);
+}
+
+.bottom_icon span {  
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 32px;
+    color: darkviolet;
+    background-color: #000000d1;
+    padding: 0 45px;
+    border: 3px solid;
+    border-color: inherit;
+    font-weight: bold;
+    border-radius: 8px;
 }
 
 .searchResults_t_info {
@@ -43,6 +137,7 @@
 }
 .searchResults_subtitle {
     padding-top: 12px;
+    display: flex;
 }
 .searchResults_counter {
     font-weight: 600;

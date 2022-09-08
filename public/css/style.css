@@ -6,9 +6,13 @@ html {
   background-color: #36353d;
   font-size: 24px;
   color: white;
-
 }
-.containerWide {
+body, 
+form {
+  margin: 0;
+}
+
+.container {
   margin-left: auto;
   margin-right: auto;
   max-width: 1200px;
@@ -22,27 +26,12 @@ a:visited {
 }
 
 @media (max-width: 1600px) {
-  .container {
-    /* width: 60%; */
-  }
-  .containerWide {
-    /* width: 85%; */
-  }
 }
 @media (max-width: 1200px) {
-  .container {
-    /* width: 70%; */
-  }
-  .containerWide {
-    /* width: 90%; */
-  }
 }
 @media (max-width: 666px) {
   .container {
-    width: 90%;
-  }
-  .containerWide {
-    width: 95%;
+    /* width: 95%; */
   }
 }
 

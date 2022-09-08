@@ -1,14 +1,37 @@
 
 <%- include('../partials/head.ejs') %>
-<link rel="stylesheet" href="/css/search.css" type="text/css">
-<div class="containerWide searchResults">
+<%- include('../partials/navbar.ejs') %>
+<style>
+    .vod_container a {
+        display: block;
+    }
 
-    <!-- <div> Search: <i> <%= vods %> </i></div> -->
-    <div>
-        <% vods.forEach( vod => { %>
-            <% let vidSrc = process.env.CDN_DOMAIN + "/" + vod.vidPath?.replaceAll(" ", "+") %>
+    .vod_container {
+        border-radius: 16px;
+        border: 1px solid;
+        padding: 50 50 50 50;
+        margin: 100 0 80 0;
+    }
+    .vod_container {
+        counter-reset: vodblock;
+    }
+    .vod_container hr {
+        counter-increment: vodblock;
+    }
+    .vod_container .counter:after {
+        content: counter(vodblock) "0";
+        font-weight: 600;
+    }
+</style>
+<div class="container">
+    <div class="vod_container">
+        <h3>Vods</h3>
+        <% vods.forEach( (vod, i) => { %>
+            <% if (i % 10 == 0) {  %>
+                <hr>
+                <div class="counter"></div>
+            <% } %>
             <a href="/vods/<%= vod.id %>">  <%= vod.vidTitle %> </a>
-            <!-- <div> <%= vod %> </div> -->
         <% }) %>
         
     </div>

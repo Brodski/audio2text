@@ -1,13 +1,15 @@
-
-<%- include('../partials/head.ejs') %>
+<%- include('../partials/head.ejs') %> 
+<%- include('../partials/navbar.ejs') %>
 <link rel="stylesheet" href="/css/search.css" type="text/css">
 <div class="container" id="search">
     <div id="main">
         <h3>Search all transcripts</h3>
-        <label> 
-            <input id="searchInp" placeholder="eg. challenger every season"/>
-        </label>
-        <button id="searchBtn" onclick="doSearch(event)">Go</button>
+        <form>
+            <label> 
+                <input id="searchInp" placeholder="eg. challenger every season"/>
+            </label>
+            <button id="searchBtn" onclick="doSearch(event)" type="submit">Go</button>
+        </form>
     </div>
 
     <div class="heading_sub1">Tips</div>
@@ -18,7 +20,7 @@
     </div>
     <div>
         <span class="search_hint">Multiple phases: </span>
-        <span class="search_ex"><i> lot of money OR challenger OR subhuman</i></span>
+        <span class="search_ex"><i> lot of money OR my man OR subhuman OR gym</i></span>
     </div>
 </div>
 <script>

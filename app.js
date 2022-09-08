@@ -1,5 +1,6 @@
 
-
+// https://www.hava.io/blog/what-is-aws-elastic-beanstalk
+// After deployment, the operations of your Elastic Beanstalk hosted applications is also easier. You no longer have to take on the role of monitoring servers, monitoring storage, managing network loads, keeping operating systems up to date since this is all taken care of by the platform.
 
 const express = require('express');
 const { default: mongoose } = require('mongoose');
@@ -27,7 +28,7 @@ mongoose.connect(dbUri)
     console.log('Error', err)
   })
   
-  app.listen(3000)
+  app.listen( process.env.port || 3000 )
 
 app.set('view engine', 'ejs')
 app.set('views', './views') // this line not needed b/c views is by default
@@ -69,7 +70,14 @@ app.post('/upload2', (req, res, next) => {
 app.get('/', async (req, res) => {
   // res.send("<p> home </p>") // auto figures out content-type 
   // res.sendFile('./views/index.html', {root: __dirname });
-  res.render('index', {title : 'Cool Title'});
+  res.render('./transcripts/search', {title : 'Cool Title'});
+
+})
+
+app.get('/test', async (req, res) => {
+  // res.send("<p> home </p>") // auto figures out content-type 
+  // res.sendFile('./views/index.html', {root: __dirname });
+  res.render('test', {title : 'Cool Title'});
 
 })
 

@@ -1,10 +1,19 @@
 
 <% let vidSrc = process.env.CDN_DOMAIN + "/" + vidAndClips.vidPath?.replaceAll(" ", "+") %>
+
+<%# Lazy load %>
+<%# https://web.dev/lazy-loading-video/ %>
+<script>
+</script>
+
 <div class="searchResults_wrap">
     <div class="searchResults_vid" >
         <div> <b> <%= vidAndClips.vidTitle %> </b></div>
         <div>  <%= vidAndClips.clips.length %> results </div>
-        <video id="<%= vidAndClips._id %>" controls src='<%= vidSrc %>'></video>
+        <video class="lazy"  id="<%= vidAndClips._id %>" controls>
+            <!-- <source data-src="one-does-not-simply.mp4" type="video/mp4"> -->
+            <source data-src="<%= vidSrc %>">
+        </video>
     </div>
     <div class="searchResults_clips" onscroll="isAtBottom(event)" >
         <div class="bottom_icon"> 
@@ -23,8 +32,8 @@
             <div class="searchResults_t_info" id="<%= clip._id %>">
                 <div class="searchResults_subtitle">
                     <span class="searchResults_counter"> <%= i + 1 %> </span>
-                    <span class="play_icon" onclick="playClip(document.querySelector(`video[src='<%= vidSrc %>'`), '<%= startTime %>' )"> <span> ▶ </span> </span>
-                    <div class="searchResults_single_clip_link"> <a href="/clip/<%= clip._id %>"> link </a></div>
+                    <span class="play_icon" onclick="playClip(document.querySelector(`video source[data-src='<%= vidSrc %>']`)?.parentElement,    '<%= startTime %>' )"> <span> ▶ </span> </span>
+                    <div class="searchResults_single_clip_link"> <a href="/clips/<%= clip._id %>"> link </a></div>
                 </div>
                 <div> <%= start %> - <%= end %></div>
                 <div> <%- clip['Transcript'] %> </div>

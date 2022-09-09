@@ -7,7 +7,6 @@ const blogController = require("../controllers/blogController");
 const { Captions } = require('../models/captions');
 const { Clip } = require('../models/captions');
 const common = require('../controllers/common.js');
-const cors = require("cors");
 require("dotenv").config();
 const allVids = require("../models/allVids");
 const parseString = require('xml2js').parseString;
@@ -40,15 +39,13 @@ router.get("/vods/all", async (req, res) => {
             vidTitle: 1,
         }
     ).then( result => {
-        console.log("result", result)
         return result
     })
     res.render("./transcripts/allVods", {vods})
-    // res.send(clip)
 })
 
 router.get("/vods/:id", async (req, res) => {
-    console.log('req.params', req.params)
+    console.log('/vods/:id - req.params', req.params)
     const id = req.params.id
 
     let vod = await Captions.findById(id)
@@ -56,17 +53,15 @@ router.get("/vods/:id", async (req, res) => {
             console.log("result", result)
             return result
     })
-    console.log({vod})
-    // res.render("./transcripts/vod", {vod})
 
     res.render("./transcripts/searchResults", {
+        h2: "Vod id: " + id,
         search: id, 
         results: [vod]
     })
-    // res.send([ vod])
 })
 
-router.get("/clip/:id", async (req, res) => {
+router.get("/clips/:id", async (req, res) => {
     console.log('req.params', req.params)
     const id = req.params.id
     let clip = await Captions.find( 
@@ -87,9 +82,7 @@ router.get("/clip/:id", async (req, res) => {
               }
           }
     ).then( result => {
-        console.log("result", result)
-        
-        // res.send( result)
+        console.log("clip result", result)
         return result
     })
     .catch(err => {
@@ -97,6 +90,7 @@ router.get("/clip/:id", async (req, res) => {
     })
 
     res.render("./transcripts/searchResults", {
+        h2: "Clip id: " + id,
         search: id, 
         results: clip 
     })
@@ -215,7 +209,7 @@ router.get("/editors-choice", async (req, res) => {
     console.debug("%o",clip)
     console.log("****")
     res.render("./transcripts/searchResults", {
-        heading: "Editor's Choice",
+        h1: "Editor's Choice",
         search: search, 
         results: clip 
     })
@@ -227,10 +221,11 @@ router.get("/editors-choice", async (req, res) => {
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
-//////////////    CDN VIDS       /////////////////////////
-//////////////    CDN VIDS       /////////////////////////
-//////////////    CDN VIDS       /////////////////////////
-//////////////    CDN VIDS       /////////////////////////
+//////////////    SAVE VIDS MONGODB      ////////////////
+//////////////    SAVE VIDS MONGODB      ////////////////
+//////////////    SAVE VIDS MONGODB      ////////////////
+//////////////    SAVE VIDS MONGODB      ////////////////
+//////////////    SAVE VIDS MONGODB      ////////////////
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
@@ -264,7 +259,7 @@ const saveCaptionsInDbAux = async (vidData) => {
     })
     console.log("######################")
     console.log("saveCaptionsInDbAux - DONE!", csvUrl)
-    console.log("saveCaptionsInDbAux - DONE! - viddata %o", vidData )
+    // console.log("saveCaptionsInDbAux - DONE! - viddata %o", vidData )
     // HERE
     const captionsMongoose = new Captions({
         ...vidData,
@@ -288,9 +283,8 @@ const saveCaptionsInDbAux = async (vidData) => {
 //     vidTitle: 'Plat 4 Start _ Level 1 to Challenger in 45 Days! _ Day 8 _ MENTAL GOD TIER WE CLIMB TODAY (full)'
 //   }]
 const saveCaptionsInDb = async (vidDatas) => {
-    // for (let i=0; i< vidDatas.length; i++) {
     let count = 0;
-    for (let i=0; i< 10; i++) {
+    for (let i=0; i< vidDatas.length; i++) {
         console.log(`saveCaptionsInDb - ${i} csv`,  vidDatas[i].csvPath)
         console.log("saveCaptionsInDb - count=", count)
         count++;
@@ -302,8 +296,6 @@ const saveCaptionsInDb = async (vidDatas) => {
             console.log("saveCaptionsInDb result - " , result?.vidPath)
             console.log("saveCaptionsInDb result - " , result?.vidTitle)
             console.log("saveCaptionsInDb result - " , result?.captions?.length)
-            // console.log(result?.id)
-            // console.log(result?._id)
             // Check if in my Database
             if (result == null) {
                 saveCaptionsInDbAux(vidDatas[i])
@@ -311,10 +303,7 @@ const saveCaptionsInDb = async (vidDatas) => {
                 console.log("saveCaptionsInDb -Not saving")
             }
         })
-        // console.log(result)    
     } 
-    // res.statusCode = resMsg.statusCode;
-    // res.json(result)
 }
 
 
@@ -379,8 +368,8 @@ router.get("/cdn/allvids", async (req, res) => {
     if (req.headers['x-bski-lazyauth'] == process.env.LAZYAUTH) {
         console.log("DOES EQUAL!!!!!!")
     }
-    res.send("done")
-    return
+    // res.send("done")
+    // return
     let x = await updateDbWithS3()
     console.log("END  do stuff")
     console.log("END  x", x)
@@ -449,19 +438,6 @@ const getAllVidFolderNamesHack = (allItemsS3) => {
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     console.log(S3_vid_path)
     console.log(S3_vid_path)
     console.log(S3_vid_path)
@@ -477,18 +453,6 @@ const getAllVidFolderNamesHack = (allItemsS3) => {
     })
 
     
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
-    console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     vidsFolder = [...new Set(vidsFolder)]

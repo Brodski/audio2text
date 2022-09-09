@@ -2,7 +2,6 @@ const express = require('express');
 const https = require('https');
 const router = express.Router();
 const { Transcript } = require('../models/transcript');
-const { TranscriptParagraphs } = require('../models/transcript');
 const { Captions } = require('../models/captions');
 const { Captions2 } = require('../models/captions');
 require("dotenv").config();
@@ -69,16 +68,6 @@ router.get("/test/csv", async (req, res) => {
     let csvUrl = process.env.CDN_DOMAIN + "/vids/maherTest/maherecsv.csv";
     // let response = await common.makeHttpRequest(csvUrl, process.env.ASSEMBLYAI_API_KEY , true)
     let response = await common.makeHttpRequest(csvUrl)
-    console.log(response)
-    console.log(response.statusCode)
-    console.log(response.data)
-    console.log('CSV')
-    console.log('CSV')
-    console.log('CSV')
-    console.log('CSV')
-    console.log('CSV')
-    console.log('CSV') 
-    // csv({output:"line"})
     let captions = await csv() //csvtojson library
     .fromString(response.data)
     .subscribe((csvObj)=>{ 
@@ -94,35 +83,29 @@ router.get("/test/csv", async (req, res) => {
             delete csvObj['End Time']
         }
     })
-    console.log("---------------")
-    console.log("---------------")
-    // console.log(captions)
-    console.log("DONE!")
-    // const captions = new Captions(x);
     const captionsMongoose = new Captions({
         captions,
         age: "69",
         title: "real time with my man bill"
     });
     
-    captionsMongoose.save().then( (result) => {
-        console.log("save success!.")
-    })
-    .catch( err => {
-        console.log("(My error csv) Error occured", err)
-    })
+    // captionsMongoose.save().then( (result) => {
+    //     console.log("save success!.")
+    // })
+    // .catch( err => {
+    //     console.log("(My error csv) Error occured", err)
+    // })
     console.log(captionsMongoose)
     res.json({captions} )
-    // res.render('transcripts/blank')
 }) 
 
 
 router.get("/test/getMahercsv", async (req, res) => {
-    let csvUrl = process.env.CDN_DOMAIN + "/vids/maherTest/maherecsv.csv";
+    let csvUrl = process.env.CDN_DOMAIN + "/maherTest/maherecsv.csv";
     res.writeHead(302, {
         'Location': csvUrl
-      });
-      res.end();
+    });
+    res.end();
 })
 
 
@@ -262,12 +245,12 @@ router.get('/test-transcript', (req, res) => {
     const transcript3 = new Transcript( {
         bang: 'sixty nine!!',
     })
-    transcript3.save().then( (result) => {
-        res.send(result)
-    })
-    .catch( err => {
-        console.log("error occured", err)
-    })
+    // transcript3.save().then( (result) => {
+    //     res.send(result)
+    // })
+    // .catch( err => {
+    //     console.log("error occured", err)
+    // })
 })
 
 

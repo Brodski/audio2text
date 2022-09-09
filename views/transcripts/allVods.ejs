@@ -4,32 +4,42 @@
 <style>
     .vod_container a {
         display: block;
+        padding-bottom: 4px;
+        padding-top: 4px;
+        padding-left: 30px;
+        /* white-space: nowrap; */
+    }
+    .vod_container a:nth-of-type(2n) {
+        /* background-color: aliceblue; */
     }
 
     .vod_container {
         border-radius: 16px;
         border: 1px solid;
         padding: 50 50 50 50;
-        margin: 100 0 80 0;
+        margin: 0 0 80 0;
     }
     .vod_container {
         counter-reset: vodblock;
     }
-    .vod_container hr {
+    .vod_container > a:nth-of-type(10n)  {
         counter-increment: vodblock;
+        /* background-color: red; */
     }
     .vod_container .counter:after {
         content: counter(vodblock) "0";
         font-weight: 600;
     }
 </style>
+<% locals.h1 = "Vods" %>
 <div class="container">
-    <div class="vod_container">
-        <h3>Vods</h3>
+    <%- include("../partials/title.ejs") %> 
+    <div class="vod_container"> 
+        <h3>Total: <%= vods.length %></h3>
         <% vods.forEach( (vod, i) => { %>
             <% if (i % 10 == 0) {  %>
-                <hr>
-                <div class="counter"></div>
+            <hr>
+            <div class="counter"></div>
             <% } %>
             <a href="/vods/<%= vod.id %>">  <%= vod.vidTitle %> </a>
         <% }) %>

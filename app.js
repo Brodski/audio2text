@@ -34,8 +34,7 @@ mongoose.connect(dbUri)
 app.set('view engine', 'ejs')
 app.set('views', './views') // this line not needed b/c views is by default
 
-// app.use(express.static(__dirname + '/public'))
-app.use(express.static('public'))
+app.use(express.static(__dirname + '/public'))
 app.use(express.urlencoded({extended: true}))
 // app.use('/blogs', blogRoutes) // (adds blogs at the start) blog/blogs/create
 
@@ -45,13 +44,13 @@ app.use(express.urlencoded({extended: true}))
 var corsOptions = { origin: '*' }
 
 // 
-app.use(cors(corsOptions))
+// app.use(cors(corsOptions))
 app.use(blogRoutes)
 app.use(transcriptRoutes)
 app.use(testRoutes)
 
 
-app.options('*', cors(corsOptions));
+// app.options('*', cors(corsOptions));
 
 
 app.get('/', async (req, res) => {

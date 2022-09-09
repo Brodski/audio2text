@@ -1,21 +1,3 @@
-class Clip {
-    constructor(vid) {
-        this.vid = vid
-    }
-    bang() {
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    }
-}
-
-
-console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-
 window.addEventListener('load', e => {
     let clipsContainer = document.querySelectorAll(".searchResults_clips");
     console.log('loaded', clipsContainer)
@@ -26,9 +8,9 @@ window.addEventListener('load', e => {
 })
 
 const setUpScrollAux = (clipsContainer) => {
-    console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
-    console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
-    console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 40)
+    // console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
+    // console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
+    // console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 40)
     if (document.readyState == "complete" && Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)  { 
         let moreIcon = clipsContainer.querySelector('.bottom_icon');
         if ( moreIcon) { moreIcon.style.display = "none"; }
@@ -73,9 +55,9 @@ function isAtBottom(e) {
     clipsContainer.scrollHeight //total possible distance
     clipsContainer.scrollTop // current distance (0 at top)
     clipsContainer.clientHeight // visible content on screen 
-    console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
-    console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
-    console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)
+    // console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
+    // console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
+    // console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)
     if (document.readyState == "complete" && Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)  { 
         let moreIcon = e.target.querySelector('.bottom_icon');
         console.log(moreIcon);
@@ -86,3 +68,38 @@ function isAtBottom(e) {
     }
     return true
 }
+
+
+
+
+const options = {
+    threshold: 0,
+    rootMargin: "-250px 0px -250px 0px"
+  }
+document.addEventListener("DOMContentLoaded", function() {
+  var lazyVideos = [].slice.call(document.querySelectorAll("video.lazy"));
+
+  if ("IntersectionObserver" in window) {
+    var lazyVideoObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(video) {
+        // console.log(video.isIntersecting)
+        if (video.isIntersecting) {
+          for (var source in video.target.children) {
+            var videoSource = video.target.children[source];
+            if (typeof videoSource.tagName === "string" && videoSource.tagName === "SOURCE") {
+              videoSource.src = videoSource.dataset.src;
+            }
+          }
+
+          video.target.load();
+          video.target.classList.remove("lazy");
+          lazyVideoObserver.unobserve(video.target);
+        }
+      });
+    }, options);
+
+    lazyVideos.forEach(function(lazyVideo) {
+      lazyVideoObserver.observe(lazyVideo);
+    });
+  }
+});

@@ -16,6 +16,7 @@ require("dotenv").config();
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_USERNAME;
 const dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/transcriptions?retryWrites=true&w=majority`
+console.log('gogo!')
 mongoose.connect(dbUri)
   .then((result) => {
     console.log("Connected to mongoose DB, gogoogogoo");

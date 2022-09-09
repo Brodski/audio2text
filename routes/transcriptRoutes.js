@@ -307,8 +307,16 @@ const updateDbWithS3 = () => {
 
 router.get("/cdn/allvids", async (req, res) => {
     // console.log(allVids)
+    console.log("req.headers");
+    console.log("req.headers");
+    console.log("req.headers");
+    console.log("req.headers");
+    console.log("req.headers");
+    console.log(req.headers);
     // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
     console.log("START gonna do stuff")
+    res.send("done")
+    return
     let x = await updateDbWithS3()
     console.log("END  do stuff")
     console.log("END  x", x)

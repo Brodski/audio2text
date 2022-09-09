@@ -161,7 +161,65 @@ router.get("/api/search", async (req, res) => {
     // res.render("./transcripts/blank")
 
 })
+router.get("/editors-choice", async (req, res) => {
+    let choices = [
+                    ObjectId("6316dd805f6a34df594b9c60"),
+                    ObjectId("6316dd805f6a34df594b9ca3"), 
+                    ObjectId("6316dd805f6a34df594b9cd9") 
+                  ];
+    let search = "challenger";
 
+    let clip = await Captions.find( 
+        {"clips._id" : { "$in" : choices }},
+        {
+              title: 1,
+              csvPath: 1,
+              vidPath: 1,
+              vidTitle: 1,
+              clips: {
+                $filter: {  
+                  input: "$clips",
+                  as: "theclips",
+                  cond: {
+                    "$in": ["$$theclips._id", choices ]
+                  },
+                }
+              }
+          }
+    ).then( result => {
+        console.log("result", result)
+        
+        // res.send( result)
+        return result
+    })
+    .catch(err => {
+        res.status(404).redirect('/404.html')
+    })
+
+    // .then( rez => {
+    //     var replace = `\\b${search}\\b`;
+    //     var re = new RegExp(replace,"gmi");
+    //     rez.forEach( vodAndClips => {
+    //         vodAndClips.clips.forEach( (clip, i, ownArr) => {
+    //         clip.Transcript = clip.Transcript.replaceAll(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
+    //         })
+    //     })
+    //     return rez
+    // })
+    console.log("clip")
+    console.log("clip")
+    console.log("clip")
+    console.log("clip")
+    console.debug("%o",clip)
+    console.log("****")
+    res.render("./transcripts/searchResults", {
+        heading: "Editor's Choice",
+        search: search, 
+        results: clip 
+    })
+    // res.render("./transcripts/blank")
+
+})
 
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////

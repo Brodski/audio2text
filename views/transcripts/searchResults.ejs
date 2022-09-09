@@ -11,6 +11,8 @@
         })
     %>
     <div class="searchResult_heading">
+        <% if (heading != 'undefined' && heading !=null) { %>
+        <h1> <%= heading %></h1> <% } %>
         <h2> Search: <i> <%= search %> </i></h2>
         <h3> Total results: <%= counter %> </h3>
     </div>

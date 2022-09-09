@@ -1,0 +1,40 @@
+<style>
+    .nav_wrap {
+        background-color: white;
+
+        border: 3px solid black;
+        border-top: 0;
+    }
+    nav { 
+        background-color: white;
+        display: flex;
+    }
+    nav a  {
+        padding: 2px 0px;
+        display: block;
+        color: black;
+        text-decoration: none;
+    }
+    nav a:before  {
+        padding: 2px 20px;
+        content: "|";
+        
+    }
+    nav a:visited {
+        color: black;
+    }
+    nav a:first-child {
+        padding-left: 4px;
+    }
+    nav a:first-child:before {
+        content: unset;
+    }
+</style>
+<div class="nav_wrap">
+    <nav class="container">
+        <a href="/">Search</a>
+        <a href="/vods/all">Vods</a>
+        <a href="/editors-choice">Editor's Choice</a>
+        <a href="/test">Test</a>
+    </nav>
+</div>

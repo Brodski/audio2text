@@ -61,6 +61,7 @@
     cursor: pointer;
     height: 100%;
     align-self: center;
+    padding-top: 1px;
 }
 .play_icon:hover,
 .play_icon:hover span {

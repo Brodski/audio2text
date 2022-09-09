@@ -1,8 +1,9 @@
 
 <%- include('../partials/head.ejs') %>
+<%- include('../partials/navbar.ejs') %>
 <link rel="stylesheet" href="/css/search.css" type="text/css">
 <script type="text/javascript" src="/js/search.js"></script>
-<div class="containerWide searchResults">
+<div class="container searchResults">
     <% 
         let counter = 0;
         results.forEach( result => {  
@@ -10,6 +11,8 @@
         })
     %>
     <div class="searchResult_heading">
+        <% if (heading != 'undefined' && heading !=null) { %>
+        <h1> <%= heading %></h1> <% } %>
         <h2> Search: <i> <%= search %> </i></h2>
         <h3> Total results: <%= counter %> </h3>
     </div>

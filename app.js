@@ -16,7 +16,7 @@ require("dotenv").config();
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_USERNAME;
 const dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/transcriptions?retryWrites=true&w=majority`
-console.log('gogo!')
+console.log('gonna connect to mongo!')
 mongoose.connect(dbUri)
   .then((result) => {
     console.log("Connected to mongoose DB, gogoogogoo");
@@ -24,12 +24,12 @@ mongoose.connect(dbUri)
     admin.buildInfo(function (err, info) {
        console.log("Mongodb version: ", info.version);
     });
+    app.listen( process.env.port || 3000 )
   })
   .catch( err => {
     console.log('Error', err)
   })
   
-  app.listen( process.env.port || 3000 )
 
 app.set('view engine', 'ejs')
 app.set('views', './views') // this line not needed b/c views is by default

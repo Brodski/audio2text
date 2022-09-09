@@ -373,6 +373,10 @@ router.get("/cdn/allvids", async (req, res) => {
     console.log(req.headers);
     // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
     console.log("START gonna do stuff")
+    console.log("req.headers.x-bski-lazyauth", req.headers['x-bski-lazyauth'])
+    if (req.headers['x-bski-lazyauth'] == process.env.LAZYAUTH) {
+        console.log("DOES EQUAL!!!!!!")
+    }
     res.send("done")
     return
     let x = await updateDbWithS3()

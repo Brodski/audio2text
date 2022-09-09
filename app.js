@@ -51,21 +51,6 @@ app.use(testRoutes)
 
 
 app.options('*', cors(corsOptions));
-// app.post('/upload', cors(corsOptions), (req, res, next) => {
-app.post('/upload', (req, res, next) => {
-  console.log("got something");
-  console.log(req)
-  res.send("got it")
-})
-
-app.post('/upload2', (req, res, next) => {
-  // res.set('Access-Control-Allow-Origin', '*')
-  console.log("got something");
-  console.log(req)
-  res.send("got it")
-})
-
-
 
 
 app.get('/', async (req, res) => {
@@ -79,14 +64,6 @@ app.get('/test', async (req, res) => {
   // res.send("<p> home </p>") // auto figures out content-type 
   // res.sendFile('./views/index.html', {root: __dirname });
   res.render('test', {title : 'Cool Title'});
-
-})
-
-app.get('/about', (req, res) => {
-  res.sendFile('./views/about.html', {root: __dirname });
-})
-
-app.get('/api/:id', (req, res) => {
 
 })
 

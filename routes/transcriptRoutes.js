@@ -24,6 +24,8 @@ var ObjectId = require('mongoose').Types.ObjectId;
 // router.get('/transcript/:id/sentence', (req, res) => {
 
 router.get("/search", async (req, res) => {
+    console.log("__dirname", __dirname)
+    console.log("__dirname", __dirname)
     res.render("transcripts/search")
 })
 

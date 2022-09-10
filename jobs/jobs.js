@@ -12,6 +12,6 @@ cron.schedule('0 0 * *  * *', () => { // every hour (at sec=0, min=0)
 
   
 cron.schedule('0 0 */2 *  * *', () => { // At 0 minutes past the hour, every 2 hours
-    console.log('running every 2 hours');
+    // console.log('running every 2 hours');
 });
 module.exports = cron

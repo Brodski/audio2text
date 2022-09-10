@@ -130,7 +130,7 @@ router.get("/api/search", async (req, res) => {
             }
           }    
     ]).then( rez => {
-        var replace = `\\b${search}\\b`;
+        var replace = `\\b${search}s?\\b`;
         var re = new RegExp(replace,"gmi");
         rez.forEach( vodAndClips => {
             vodAndClips.clips.forEach( (clip, i, ownArr) => {
@@ -157,13 +157,84 @@ router.get("/api/search", async (req, res) => {
     // res.render("./transcripts/blank")
 
 })
+
+    // Fake chall
+
+ 
+    // ObjectId("631b1e98d0f891998d43963b
+    // ObjectId("631b29784cfec30d539a5d0f
+    // ObjectId("631b297a4cfec30d539aa3a5
+    // ObjectId("631b297e4cfec30d539ad804
+    // ObjectId("631b297e4cfec30d539ae07a 
+    // ObjectId("631b297f4cfec30d539aeafc
+    // ObjectId("631b297e4cfec30d539ae0a0
+    // ObjectId("631b297f4cfec30d539aeafd
+    // ObjectId("631b297f4cfec30d539aeb75
+    // ObjectId("631b297e4cfec30d539ae3f7
+    // ObjectId("631b297e4cfec30d539ae478
+    // ObjectId("631b29774cfec30d539a5a73 ???
+    // ObjectId("631b297d4cfec30d539acc8a
+    // ObjectId("631b29774cfec30d539a2b96
+    // ObjectId("631b297a4cfec30d539aa6e8
+    // ObjectId("631b297a4cfec30d539aa6fc
+    // ObjectId("631b29774cfec30d539a39f5 macro easy
+    // ObjectId("631b29774cfec30d539a2eb4
+    // ObjectId("6319d32fdea50b763ba2534a
+
+
+
+    // 1st humble ever
+    // ObjectId("631b29794cfec30d539a7f2d
+
+    // honorabl mention (i have no life)
+
+
+    // NOT CHALL ANY MORE - season 9
+    // ObjectId("631b297d4cfec30d539ad15e
+    // ObjectId("631b297e4cfec30d539ad714
+    // ObjectId("631b297a4cfec30d539aa56b
+    // ObjectId("631b297a4cfec30d539aa6fc
+    // ObjectId("631b297a4cfec30d539aa714
+    // ObjectId("631b297a4cfec30d539aa277
+    // ObjectId("631b1e9ad0f891998d4471bf
+    // ObjectId("631b1e99d0f891998d43df07
+
 router.get("/editors-choice", async (req, res) => {
     let choices = [
-                    ObjectId("6316dd805f6a34df594b9c60"),
-                    ObjectId("6316dd805f6a34df594b9ca3"), 
-                    ObjectId("6316dd805f6a34df594b9cd9") 
+                    ObjectId("631b297e4cfec30d539ae088"),
+                    ObjectId("631b297c4cfec30d539ac4f3"), // this
+                    ObjectId("631b297c4cfec30d539ab317"),
+                    ObjectId("631b29774cfec30d539a0c32"),
+                    ObjectId("631b297e4cfec30d539ad741"),
+                    ObjectId("631b29794cfec30d539a7ffa"),
+                    ObjectId("631b29774cfec30d539a27ee"),
+                    ObjectId("631b29774cfec30d539a27e5"),
+                    ObjectId("631b29774cfec30d539a0bc1"),  
+                    ObjectId("6316dd815f6a34df594b9fad"),
+                    ObjectId("631b1e9ad0f891998d444d7d"), // coaching a chall            
+                
+                    ObjectId("631b29784cfec30d539a6afd"),
+                    ObjectId("631b297a4cfec30d539a9ae1"),
+                    ObjectId("631b297a4cfec30d539a9ae2"),
+                    ObjectId("631b297a4cfec30d539a9d81"),
+                    ObjectId("631b297c4cfec30d539aaed5"),
+                    ObjectId("631b297c4cfec30d539ab00c"), // chall level knowledge
+                    ObjectId("631b297c4cfec30d539ac39d"),
+                    ObjectId("631b297c4cfec30d539ac4ab"), // diamond harder than chall
+                    ObjectId("631b297a4cfec30d539aa3ca"),
+                    
+                    ObjectId("631b29774cfec30d539a2b36"),
+                    ObjectId("631b29774cfec30d539a51cf"),
+                    ObjectId("631b29784cfec30d539a7ae4"),
+                    ObjectId("631b29774cfec30d539a1bb9"),
+                    ObjectId("631b1e99d0f891998d43c6df"),
+                    ObjectId("631b1e99d0f891998d443485"),
+                    ObjectId("631b1e9ad0f891998d4471a9"),
+                    ObjectId("6319d32fdea50b763ba255f6"),
+                    ObjectId("631b1e98d0f891998d4395a0"),
                   ];
     let search = "challenger";
+
 
     let clip = await Captions.find( 
         {"clips._id" : { "$in" : choices }},
@@ -182,26 +253,20 @@ router.get("/editors-choice", async (req, res) => {
                 }
               }
           }
-    ).then( result => {
-        console.log("result", result)
-        
-        // res.send( result)
-        return result
+    ).then( rez => {
+        let search = "challenger"
+        var replace = `\\b${search}s?\\b`;
+        var re = new RegExp(replace,"gmi");
+        rez.forEach( vodAndClips => {
+            vodAndClips.clips.forEach( (clip, i, ownArr) => {
+            clip.Transcript = clip.Transcript.replaceAll(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
+            })
+        })
+        return rez
     })
     .catch(err => {
         res.status(404).redirect('/404.html')
     })
-
-    // .then( rez => {
-    //     var replace = `\\b${search}\\b`;
-    //     var re = new RegExp(replace,"gmi");
-    //     rez.forEach( vodAndClips => {
-    //         vodAndClips.clips.forEach( (clip, i, ownArr) => {
-    //         clip.Transcript = clip.Transcript.replaceAll(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
-    //         })
-    //     })
-    //     return rez
-    // })
     console.log("clip")
     console.log("clip")
     console.log("clip")
@@ -213,9 +278,57 @@ router.get("/editors-choice", async (req, res) => {
         search: search, 
         results: clip 
     })
-    // res.render("./transcripts/blank")
 
 })
+
+// code could be improved.
+router.get("/honorable-mentions", async (req, res) => {
+    let choices = [
+                    ObjectId("631b297a4cfec30d539a99eb"),
+                    ObjectId("631b29774cfec30d539a0c33"), // (i dont care about getting chall)
+                    ObjectId("631b1e98d0f891998d43960b"), // havnt been chall since season 3
+                  ];
+
+    let search = "challenger";
+    let clip = await Captions.find( 
+        {"clips._id" : { "$in" : choices }},
+        {
+              title: 1,
+              csvPath: 1,
+              vidPath: 1,
+              vidTitle: 1,
+              clips: {
+                $filter: {  
+                  input: "$clips",
+                  as: "theclips",
+                  cond: {
+                    "$in": ["$$theclips._id", choices ]
+                  },
+                }
+              }
+          }
+    ).then( rez => {
+        let search = "challenger"
+        var replace = `\\b${search}s?\\b`;
+        var re = new RegExp(replace,"gmi");
+        rez.forEach( vodAndClips => {
+            vodAndClips.clips.forEach( (clip, i, ownArr) => {
+            clip.Transcript = clip.Transcript.replaceAll(re, `<span class="highlight">${search}</span>`) // syntax stuff for "OR"
+            })
+        })
+        return rez
+    })
+    .catch(err => {
+        res.status(404).redirect('/404.html')
+    })
+    res.render("./transcripts/searchResults", {
+        h1: "Honorable Mention",
+        search: search, 
+        results: clip 
+    })
+
+})
+
 
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////

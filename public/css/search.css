@@ -86,9 +86,11 @@
         width: 100%;
         height: auto;
     }
+    /* https://css-tricks.com/preventing-a-grid-blowout/ */
     .searchResults_wrap {
         display: grid;
         grid-template-columns: 1fr 400px;
+        grid-template-columns: minmax(0, 1fr) 300px; 
         grid-gap: 6px;
     }
 }

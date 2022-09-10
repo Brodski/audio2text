@@ -8,9 +8,6 @@ window.addEventListener('load', e => {
 })
 
 const setUpScrollAux = (clipsContainer) => {
-    // console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
-    // console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
-    // console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 40)
     if (document.readyState == "complete" && Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)  { 
         let moreIcon = clipsContainer.querySelector('.bottom_icon');
         if ( moreIcon) { moreIcon.style.display = "none"; }
@@ -20,11 +17,6 @@ const setUpScrollAux = (clipsContainer) => {
 
 function setUpScroll(clipsContainer) {
     console.log('setting up on', clipsContainer)
-    // let clipsContainer = e.target;
-    // clipsContainer.scrollHeight //total possible distance
-    // clipsContainer.scrollTop // current distance (0 at top)
-    // clipsContainer.clientHeight // visible content on screen 
-
     setUpScrollAux(clipsContainer);
     clipsContainer.addEventListener('scroll', e => {
         setUpScrollAux(clipsContainer);
@@ -40,6 +32,7 @@ function playClip(vid, startTime) {
         playPromise.then(_ => {
             // Automatic playback started! Show playing UI. We can now safely pause video...
             video.pause();
+            video.focus();
         })
         .catch(error => {
             // Auto-play was prevented. Show paused UI.
@@ -52,9 +45,9 @@ function playClip(vid, startTime) {
 function isAtBottom(e) {
     // console.log(e)
     let clipsContainer = e.target;
-    clipsContainer.scrollHeight //total possible distance
-    clipsContainer.scrollTop // current distance (0 at top)
-    clipsContainer.clientHeight // visible content on screen 
+    // clipsContainer.scrollHeight //total possible distance
+    // clipsContainer.scrollTop // current distance (0 at top)
+    // clipsContainer.clientHeight // visible content on screen 
     // console.log("clipsContainer.clientHeight", clipsContainer.clientHeight)
     // console.log("clipsContainer.scrollHeight", clipsContainer.scrollHeight)
     // console.log("at bottom?",  Math.abs(clipsContainer.scrollHeight - clipsContainer.clientHeight - clipsContainer.scrollTop) < 50)

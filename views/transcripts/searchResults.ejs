@@ -9,14 +9,6 @@
         results.forEach( result => {  
             counter += result.clips.length;
         })
-        console.log("global")
-        console.log("global")
-        console.log("global")
-        console.log("global")
-        console.log(global.htmlHeading)
-        console.log(global.htmlHeading)
-        console.log("locals")
-        console.log(locals)
         locals.h2 = typeof h2 != "undefined" ? h2 : "Search: <i>" + search  + "</i>";
         locals.h3 = typeof h3 != "undefined" ? h3 : "Total results: " + counter;
     %>

@@ -20,8 +20,6 @@ var ObjectId = require('mongoose').Types.ObjectId;
 
 // https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences
 
-// router.get('/transcript/:id/sentence', (req, res) => {
-
 router.get("/search", async (req, res) => {
     console.log("__dirname", __dirname)
     console.log("__dirname", __dirname)
@@ -97,7 +95,6 @@ router.get("/clips/:id", async (req, res) => {
 })
 router.get("/api/search", async (req, res) => {
     console.log("got this req.query", req.query);
-    console.log("got this req.params", req.params);
 
     let search = common.processQuery(req.query.search);
     // processQuery("big nasty string");
@@ -139,23 +136,14 @@ router.get("/api/search", async (req, res) => {
         })
         return rez
     })
-    console.log("searchResults")
-    console.log("searchResults")
-    console.log("searchResults")
-    console.log("searchResults")
-    console.debug("%o",searchResults)
+    console.log("searchResults", searchResults)
+    // console.debug("%o",searchResults)
     console.log("****")
-    let body = {
-        query: search,
-        results: searchResults
-    };
-    // res.send(body)
+
     res.render("./transcripts/searchResults", {
         search: search, 
         results: searchResults 
     })
-    // res.render("./transcripts/blank")
-
 })
 
     // not working http://localhost:3000/vods/631b1e9ad0f891998d449c7b
@@ -268,12 +256,17 @@ router.get("/editors-choice", async (req, res) => {
     .catch(err => {
         res.status(404).redirect('/404.html')
     })
-    console.log("clip")
-    console.log("clip")
-    console.log("clip")
-    console.log("clip")
+    // console.log("clip", clip)
+    console.debug("CLIP!")
     console.debug("%o",clip)
-    console.log("****")
+    console.log("*******")
+    // let geraWantsFull = clip.map( c => {
+    //     return { 
+    //             "path": process.env.CDN_DOMAIN + '/' + c.vidPath?.replaceAll(" ", "+").replaceAll("#", "%23"),
+    //             "time": c.clips.map( actual_clip => actual_clip['Start Time'])
+    //         };
+    // })
+    // console.log(geraWantsFull)
     res.render("./transcripts/searchResults", {
         h1: "Editor's Choice",
         search: search, 

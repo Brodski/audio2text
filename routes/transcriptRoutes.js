@@ -472,12 +472,13 @@ router.get("/cdn/allvids", async (req, res) => {
     // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
     console.log("START gonna do stuff")
     console.log("req.headers.x-bski-lazyauth", req.headers['x-bski-lazyauth'])
+    let x;
     if (req.headers['x-bski-lazyauth'] == process.env.LAZYAUTH) {
-        console.log("DOES EQUAL!!!!!!")
+        console.log("x-bski-lazyauth DOES EQUAL!!!!!!")
+        x = await updateDbWithS3()
     }
     // res.send("done")
     // return
-    let x = await updateDbWithS3()
     console.log("END  do stuff")
     console.log("END  x", x)
     if (x == 200 ) {

@@ -1,12 +1,20 @@
 <%- include('../partials/head.ejs') %> 
 <%- include('../partials/navbar.ejs') %>
 <link rel="stylesheet" href="/css/search.css" type="text/css">
+<% 
+ let placeholder = process.env.SAMPLE_PLACEHOLDER != null ? process.env.SAMPLE_PLACEHOLDER : "eg. challenger every season"
+ let tip = process.env.SAMPLE_TIP1 != null ? process.env.SAMPLE_TIP1 : "challenger every season"
+ let tip2 = process.env.SAMPLE_TIP2 != null ? process.env.SAMPLE_TIP2 : "lot of money OR my man OR subhuman OR gym"
+ console.log('placeholder', placeholder)
+ console.log('tip', tip)
+ console.log('tip2', tip2)
+%> 
 <div class="container" id="search">
     <div id="main">
         <h3>Search all transcripts</h3>
         <form>
             <label> 
-                <input id="searchInp" placeholder="eg. challenger every season"/>
+                <input id="searchInp" placeholder="<%= placeholder %>"/>
             </label>
             <button id="searchBtn" onclick="doSearch(event)" type="submit">Go</button>
         </form>
@@ -16,11 +24,11 @@
     <hr/>
     <div>
         <span class="search_hint">Exact phase: </span>
-        <span class="search_ex"><i>challenger every season</i></span>
+        <span class="search_ex"><i><%= tip %></i></span>
     </div>
     <div>
         <span class="search_hint">Multiple phases: </span>
-        <span class="search_ex"><i> lot of money OR my man OR subhuman OR gym</i></span>
+        <span class="search_ex"><i> <%= tip2 %></i></span>
     </div>
 </div>
 <script>

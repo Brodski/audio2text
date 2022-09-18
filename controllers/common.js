@@ -1,7 +1,4 @@
-
 const https = require('https');
-
-
 
 /*
  * Takes in: "challenger every season" ===> finds exactly that string
@@ -58,17 +55,10 @@ const errorHandler = (response, data) => {
 
 const makeHttpRequest = async (myUrl, optionz, isCsv = false) => {
     console.log(" ##########################################################" )
-    console.log("---------------------------> Requesting: ", myUrl)
-    console.log(" #" )
+    console.log("<>Requesting: ", myUrl)
     return new Promise(function (resolve, reject) {
-        console.log("PROMISE! ")
-        let options;
-        // if (optionz != null) {
-        //     options = optionz != null ? optionz : {};
-        // }
-        options = optionz != null ? optionz : {};
-        let request = https.get(myUrl, options, (response) => {
-            // console.log('statusCode:', response.statusCode);
+        optionz = {};
+        let request = https.get(myUrl, optionz, (response) => {
             let data = ''
             response.on('data', function (chunk) {
                 // console.log("chunk ", chunk.slice(0,20))

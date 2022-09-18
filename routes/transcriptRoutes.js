@@ -5,13 +5,12 @@ const router = express.Router();
 const blogController = require("../controllers/blogController");
 
 const { Captions } = require('../models/captions');
-const { Clip } = require('../models/captions');
+const { Clip }  = require('../models/captions');
 const common = require('../controllers/common.js');
 require("dotenv").config();
 const allVids = require("../models/allVids");
 const parseString = require('xml2js').parseString;
 const VidData = require('../models/VidData');
-const { S3_vid_path } = require('../models/Constantz.js');
 
 const csv = require("csvtojson");
 const { parseStringPromise } = require('xml2js');
@@ -21,7 +20,6 @@ var ObjectId = require('mongoose').Types.ObjectId;
 // https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences
 
 router.get("/search", async (req, res) => {
-    console.log("__dirname", __dirname)
     console.log("__dirname", __dirname)
     res.render("transcripts/search")
 })
@@ -127,7 +125,8 @@ router.get("/api/search", async (req, res) => {
             }
           }    
     ]).then( rez => {
-        var replace = `\\b${search}s?\\b`;
+        // var replace = `\\b${search}s?\\b`;
+        var replace = `\\b${search}`;
         var re = new RegExp(replace,"gmi");
         rez.forEach( vodAndClips => {
             vodAndClips.clips.forEach( (clip, i, ownArr) => {
@@ -358,11 +357,6 @@ const saveCaptionsInDbAux = async (vidData) => {
         }
         let clip = new Clip (csvObj)
         clips.push(clip);
-
-        // if (csvObj['Start Time']) {
-        //     csvObj['Start'] = csvObj['Start Time']
-        //     delete csvObj['Start Time']
-        // }
     })
     console.log("######################")
     console.log("saveCaptionsInDbAux - DONE!", csvUrl)
@@ -371,15 +365,18 @@ const saveCaptionsInDbAux = async (vidData) => {
     const captionsMongoose = new Captions({
         ...vidData,
         clips
-        // captions,
     });
-    
-    captionsMongoose.save().then( (result) => {
-        console.log("saveCaptionsInDbAux - save success!.")
-    })
-    .catch( err => {
-        console.log("(My error csv) Error occured", err)
-    })
+    if (process.env.DRY_RUN == "true") {
+        console.log("saveCaptionsInDbAux - FAKE SAVE!", captionsMongoose.vidData)
+        return true
+    } else {
+        captionsMongoose.save().then( (result) => {
+            console.log("saveCaptionsInDbAux - save success!.")
+        })
+        .catch( err => {
+            console.log("(My error csv) Error occured", err)
+        })
+    }
     // console.log("%o", captionsMongoose)
     return true;
 
@@ -406,6 +403,9 @@ const saveCaptionsInDb = async (vidDatas) => {
             // Check if in my Database
             if (result == null) {
                 saveCaptionsInDbAux(vidDatas[i])
+                console.log("saveCaptionsInDb  saved - " , vidDatas[i]?.csvPath)
+                console.log("saveCaptionsInDb  saved - " , vidDatas[i]?.vidPath)
+                console.log("saveCaptionsInDb  saved - " , vidDatas[i]?.vidTitle)
             } else {
                 console.log("saveCaptionsInDb -Not saving")
             }
@@ -425,6 +425,8 @@ const saveCaptionsInDb = async (vidDatas) => {
 //      ...
 //      ...
 // ]    
+
+// in perfect world this (even knowing this entire save function is wack to begin with), we shouldnt have this endpoint even on this server, since that it is publicly accessible
 const updateDbWithS3 = () => {
 
     return new Promise( async (resolve, reject) => {
@@ -445,10 +447,8 @@ const updateDbWithS3 = () => {
                    console.log("everyVidDatas")
                    console.log("(OMITED)")
                    console.log(everyVidDatas)
-                // HERE
-                // HERE
-                // HERE
-                // HERE we want to seperate this save function
+
+                   // bam
                    let isRecentUpdated = saveCaptionsInDb(everyVidDatas)
                    resolve(200);
                 }
@@ -469,7 +469,6 @@ router.get("/cdn/allvids", async (req, res) => {
     console.log("req.headers");
     console.log("req.headers");
     console.log(req.headers);
-    // let url = "https://d2h6hz1aakujaj.cloudfront.net/bifrost3d_clothed.png"
     console.log("START gonna do stuff")
     console.log("req.headers.x-bski-lazyauth", req.headers['x-bski-lazyauth'])
     let x;
@@ -482,11 +481,11 @@ router.get("/cdn/allvids", async (req, res) => {
     console.log("END  do stuff")
     console.log("END  x", x)
     if (x == 200 ) {
-        res.send("Complete")
+        res.send("Complete updateDbWithS3()")
     }
     else {
         res.statusCode = 400;
-        res.send("Error :(")
+        res.send("Error, not auth for updateDbWithS3 :(")
     }
      
 })
@@ -546,6 +545,8 @@ const getAllVidFolderNamesHack = (allItemsS3) => {
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
     console.log("+ + + + + + + + + + + + + + + + + + + + + ")
+    
+    const S3_vid_path = process.env.SAMPLE_VIDPATH != null ? process.env.SAMPLE_VIDPATH : 'vids/';
     console.log(S3_vid_path)
     console.log(S3_vid_path)
     console.log(S3_vid_path)
@@ -566,35 +567,9 @@ const getAllVidFolderNamesHack = (allItemsS3) => {
     vidsFolder = [...new Set(vidsFolder)]
     console.log(vidsFolder)
     return vidsFolder
-    // let allFolderNames = allItemsS3.map( itemPath => { 
-    //     console.log("------", itemPath) 
-    //     const S3_vid_path = S3VideoRootFolder;
-    //     if ( !itemPath.startsWith(S3_vid_path)) {
-    //         return;
-    //     }
-    //     let split = itemPath.split("/")
-    //     let half_1st = split[0];
-    //     let folderName = split[1];
-    //     let half_3rd = split.slice(2).join('/');
-    //     // console.log("folderName - half 1st", half_1st)
-    //     // console.log("folderName - half 2nd", folderName)
-    //     // console.log("folderName - half 3rd", half_3rd)
-    //     return folderName
-    // })
     // allFolderNames = allFolderNames.filter(folder => { return folder != null })
     // allFolderNames = [...new Set(allFolderNames)]
     // return allFolderNames
-}
-//  All s3 items should be formated as <id>_ID_<name>
-const parseIdFromName_OLDASSEBMLY = (s3Name) => {
-    let idx = s3Name.toUpperCase().indexOf("_ID_");
-    if (idx == -1) {
-        return {id: null, name: s3Name }
-    }
-    let name = s3Name.substring(idx+4);
-    let id = s3Name.substring(0,idx);
-    return {id, name}
-
 }
 
 const getEveryVidDatas = (result) => {
@@ -607,7 +582,7 @@ const getEveryVidDatas = (result) => {
     console.log(allItemsS3)
     // 2. item.Key is an array for some reason. Fix that.
     // allItemsS3 = [ 'some-folder/deep-folder/95024051_p0.jpg', 
-    //                'some-folder/deep-folder/TncMx-morgan-hultgren-51.jpg',                                                                                        'vids/maherTest/Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p.mp4',                                      'vids/maherTest/maherecsv.csv',
+    //                'some-folder/deep-folder/TncMx-morgan-hultgren-51.jpg',                     'vids/maherTest/Real Time With Bill Maher Season 20 Episode 22 HBO Bill Maher Aug 5, 2022 FULL 720p.mp4',                                      'vids/maherTest/maherecsv.csv',
     //                'vids/maherTest/mahertxt.txt' 
     //                'vids/maherTest/maherecsv.csv',
     //                'vids/maherTest/mahertxt.txt'    ]  
@@ -619,7 +594,7 @@ const getEveryVidDatas = (result) => {
     
     
     console.log(3)
-    let allFolderNames = getAllVidFolderNamesHack(allItemsS3) // Actually get everythign in "vids/"
+    let allFolderNames = getAllVidFolderNamesHack(allItemsS3) // Actually get everythign in "vids/" (or "sample-vids/" if on sample-env)
 
     console.log(3)
     console.log(allFolderNames)

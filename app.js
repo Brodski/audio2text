@@ -15,7 +15,33 @@ require("dotenv").config();
 
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_USERNAME;
-const dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/transcriptions?retryWrites=true&w=majority`
+let dbUri = '';
+if (process.env.SAMPLE_ENV == true) {
+  console.log("IS TRUEEEEEEE")
+  console.log("IS TRUEEEEEEE")
+  console.log("IS TRUEEEEEEE")
+  console.log("IS TRUEEEEEEE")
+}
+if (process.env.SAMPLE_ENV2 == "true") {
+  console.log("IS kek")
+  console.log("IS kek")
+  console.log("IS kek")
+  console.log("IS kek")
+  console.log("IS kek")
+}
+
+// sloppy, should update at some point. (have to update env-variables in Beanstalk)
+if (process.env.SAMPLE_DB_NAME != null ){
+  console.log("Connecting to sample DB")
+  console.log("Connecting to sample DB")
+  console.log("Connecting to sample DB")
+  console.log("Connecting to sample DB")
+  console.log("Connecting to sample DB")
+  dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/${process.env.SAMPLE_DB_NAME}?retryWrites=true&w=majority`
+} else {
+  dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/transcriptions?retryWrites=true&w=majority`
+}
+
 console.log('gonna connect to mongo!')
 mongoose.connect(dbUri)
   .then((result) => {

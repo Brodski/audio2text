@@ -4,21 +4,21 @@ const AWS = require('aws-sdk');
 const https = require('https');
 const parseString = require('xml2js').parseString;
 
-const bucketName = process.env.AWS_BUCKET_REGION;
-const region = process.env.AWS_BUCKET_REGION;
-const accessKeyId = process.env.AWS_ACCESS_KEY;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+// const bucketName = process.env.AWS_BUCKET_REGION;
+// const region = process.env.AWS_BUCKET_REGION;
+// const accessKeyId = process.env.AWS_ACCESS_KEY;
+// const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
 async function go() {
-    const s3 = new AWS.S3({
-        region,
-        accessKeyId,
-        secretAccessKey
-    })
+    // const s3 = new AWS.S3({
+    //     region,
+    //     accessKeyId,
+    //     secretAccessKey
+    // })
     
-    console.log("s3 go")
+    // console.log("s3 go")
     // console.log(s3)
-    let params = { "Bucket": bucketName }
+    // let params = { "Bucket": bucketName }
     
     // https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html
     // AWS Identity and Access Management (IAM) policy, you must have permissions to perform the s3:ListBucket action

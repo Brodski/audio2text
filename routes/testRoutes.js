@@ -64,40 +64,26 @@ router.get("/test/csvFind", async (req, res) => {
 
 
     
-router.get("/test/csv", async (req, res) => {
-    let csvUrl = process.env.CDN_DOMAIN + "/vids/maherTest/maherecsv.csv";
-    // let response = await common.makeHttpRequest(csvUrl, process.env.ASSEMBLYAI_API_KEY , true)
-    let response = await common.makeHttpRequest(csvUrl)
-    let captions = await csv() //csvtojson library
-    .fromString(response.data)
-    .subscribe((csvObj)=>{ 
-        console.log("csvObj:", csvObj)
-        csvObj.Transcript = csvObj.Transcript?.replace("\r", " ");
-        csvObj.fukboy = "in your head rent free";
-        if (csvObj['Start Time']) {
-            csvObj['Start'] = csvObj['Start Time']
-            delete csvObj['Start Time']
-        }
-        if (csvObj['End Time']) {
-            csvObj['End'] = csvObj['End Time']
-            delete csvObj['End Time']
-        }
-    })
-    const captionsMongoose = new Captions({
-        captions,
-        age: "69",
-        title: "real time with my man bill"
-    });
+// router.get("/test/csv", async (req, res) => {
+//     let csvUrl = process.env.CDN_DOMAIN + "/vids/maherTest/maherecsv.csv";
+//     // let response = await common.makeHttpRequest(csvUrl, process.env.ASSEMBLYAI_API_KEY , true)
+//     let response = await common.makeHttpRequest(csvUrl)
+//     let captions = await csv() //csvtojson library
+//     .fromString(response.data)
+//     .subscribe((csvObj)=>{ 
+//         console.log("csvObj:", csvObj)
+//         csvObj.Transcript = csvObj.Transcript?.replace("\r", " ");
+//         csvObj.fukboy = "in your head rent free";
+//     })
+//     const captionsMongoose = new Captions({
+//         captions,
+//         age: "69",
+//         title: "real time with my man bill"
+//     });
     
-    // captionsMongoose.save().then( (result) => {
-    //     console.log("save success!.")
-    // })
-    // .catch( err => {
-    //     console.log("(My error csv) Error occured", err)
-    // })
-    console.log(captionsMongoose)
-    res.json({captions} )
-}) 
+//     console.log(captionsMongoose)
+//     res.json({captions} )
+// }) 
 
 
 router.get("/test/getMahercsv", async (req, res) => {
@@ -134,225 +120,53 @@ router.get("/test/getMahercsv", async (req, res) => {
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-router.get('/test-transcript', (req, res) => {
 
-    // const transcript = new Transcript( {
-    //   "gender": "male",
-    //   "name": {
-    //     "title": "mr",
-    //     "first": "brad",
-    //     "last": "gibson"
-    //   },
-    //   "location": {
-    //     "street": "9278 new road",
-    //     "city": "kilcoole",
-    //     "state": "waterford",
-    //     "postcode": "93027",
-    //     "coordinates": {
-    //       "latitude": "20.9267",
-    //       "longitude": "-7.9310"
-    //     },
-    //     "timezone": {
-    //       "offset": "-3:30",
-    //       "description": "Newfoundland"
-    //     }
-    //   },
-    //   "email": "brad.gibson@example.com",
-    //   "login": {
-    //     "uuid": "155e77ee-ba6d-486f-95ce-0e0c0fb4b919",
-    //     "username": "silverswan131",
-    //     "password": "firewall",
-    //     "salt": "TQA1Gz7x",
-    //     "md5": "dc523cb313b63dfe5be2140b0c05b3bc",
-    //     "sha1": "7a4aa07d1bedcc6bcf4b7f8856643492c191540d",
-    //     "sha256": "74364e96174afa7d17ee52dd2c9c7a4651fe1254f471a78bda0190135dcd3480"
-    //   },
-    //   "dob": {
-    //     "date": "1993-07-20T09:44:18.674Z",
-    //     "age": 26
-    //   },
-    //   "registered": {
-    //     "date": "2002-05-21T10:59:49.966Z",
-    //     "age": 17
-    //   },
-    //   "phone": "011-962-7516",
-    //   "cell": "081-454-0666",
-    //   "id": {
-    //     "name": "PPS",
-    //     "value": "0390511T"
-    //   },
-    //   "picture": {
-    //     "large": "https://randomuser.me/api/portraits/men/75.jpg",
-    //     "medium": "https://randomuser.me/api/portraits/med/men/75.jpg",
-    //     "thumbnail": "https://randomuser.me/api/portraits/thumb/men/75.jpg"
-    //   },
-    //   "nat": "IE"
-    // })
-
-    // const transcript2 = new Transcript( {
-    // "gender": "female",
-    // "name": {
-    //     "title": "mrs",
-    //     "first": "bradina",
-    //     "last": "gibson"
-    // },
-    // "location": {
-    //     "street": "X9278 new road",
-    //     "city": "Xkilcoole",
-    //     "state": "Xwaterford",
-    //     "postcode": "X93027",
-    //     "coordinates": {
-    //     "latitude": "20.9267",
-    //     "longitude": "-7.9310"
-    //     },
-    //     "timezone": {
-    //     "offset": "-3:30",
-    //     "description": "Newfoundland"
-    //     }
-    // },
-    // "email": "XXbrad.gibson@example.com",
-    // "login": {
-    //     "uuid": "155e77ee-ba6d-486f-95ce-0e0c0fb4b919",
-    //     "username": "XXsilverswan131",
-    //     "password": "XXfirewall",
-    //     "salt": "TQA1Gz7x",
-    //     "md5": "dc523cb313b63dfe5be2140b0c05b3bc",
-    //     "sha1": "7a4aa07d1bedcc6bcf4b7f8856643492c191540d",
-    //     "sha256": "74364e96174afa7d17ee52dd2c9c7a4651fe1254f471a78bda0190135dcd3480"
-    // },
-    // "dob": {
-    //     "date": "1993-07-20T09:44:18.674Z",
-    //     "age": 26
-    // },
-    // "registered": {
-    //     "date": "2002-05-21T10:59:49.966Z",
-    //     "age": 17
-    // },
-    // "phone": "011-962-7516",
-    // "cell": "081-454-0666",
-    // "id": {
-    //     "name": "PPS",
-    //     "value": "0390511T"
-    // },
-    // "picture": {
-    //     "large": "https://randomuser.me/api/portraits/men/75.jpg",
-    //     "medium": "https://randomuser.me/api/portraits/med/men/75.jpg",
-    //     "thumbnail": "https://randomuser.me/api/portraits/thumb/men/75.jpg"
-    // },
-    // "nat": "IE"
-    // })
-
-    const transcript3 = new Transcript( {
-        bang: 'sixty nine!!',
-    })
-    // transcript3.save().then( (result) => {
-    //     res.send(result)
-    // })
-    // .catch( err => {
-    //     console.log("error occured", err)
-    // })
-})
+// YOUTUBE CAPTIONS .......... TODO
+// YOUTUBE CAPTIONS .......... TODO
+// YOUTUBE CAPTIONS .......... TODO
+// YOUTUBE CAPTIONS .......... TODO
+// YOUTUBE CAPTIONS .......... TODO
 
 
-// router.get('/transcript/:id/sentence', (req, res) => {
-    router.get("/yt/test", async (req, res) => {
-        let videoId = "M7FIvfx5J10";
-        let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${process.env.YT_KEY}`; 
-        let response = await common.makeHttpRequest(ytUrl);
-        console.log(response)
-        console.log(response.items);
-        console.log("==========================");
-        console.log("==========================");
-        console.log("==========================");
-        let englishCcId = ""
-        response.data.items.forEach( item => {
-            // console.log(item.id);
-            // console.log(item.snippet?.videoId);
-            // console.log(item.snippet);
-            if (item.snippet?.language == "en") {
-                console.log(item);
-                console.log("ENGLISH", item.id)
-                englishCcId = item.id;
-                return;
-            }
-        })
-        if (englishCcId) {
-            //download cc
-            let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions/${englishCcId}?key=${process.env.YT_KEY}`;
-            console.log("ytUrl")
-            console.log(ytUrl)
-            let x = await common.makeHttpRequest(ytUrl);
-            console.log("++++++++++++++++++++++++++++++++++++++++++++");
-            console.log("++++++++++++++++++++++++++++++++++++++++++++");
-            console.log(x)
-    
-        }
-        
-        res.statusCode = 200;
-        // res.send("GOOD!");
-        res.send("GOOD!");
-        return;
-    })
+// router.get("/yt/test", async (req, res) => {
+//     let videoId = "M7FIvfx5J10";
+//     let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${process.env.YT_KEY}`; 
+//     let response = await common.makeHttpRequest(ytUrl);
+//     console.log(response)
+//     console.log(response.items);
+//     console.log("==========================");
+//     console.log("==========================");
+//     console.log("==========================");
+//     let englishCcId = ""
+//     response.data.items.forEach( item => {
+//         // console.log(item.id);
+//         // console.log(item.snippet?.videoId);
+//         // console.log(item.snippet);
+//         if (item.snippet?.language == "en") {
+//             console.log(item);
+//             console.log("ENGLISH", item.id)
+//             englishCcId = item.id;
+//             return;
+//         }
+//     })
+//     if (englishCcId) {
+//         //download cc
+//         let ytUrl = `https://youtube.googleapis.com/youtube/v3/captions/${englishCcId}?key=${process.env.YT_KEY}`;
+//         console.log("ytUrl")
+//         console.log(ytUrl)
+//         let x = await common.makeHttpRequest(ytUrl);
+//         console.log("++++++++++++++++++++++++++++++++++++++++++++");
+//         console.log("++++++++++++++++++++++++++++++++++++++++++++");
+//         console.log(x)
 
-    router.get("/customGet", async (req, res) => {
-        res.render("transcripts/customGet")
-    })
+//     }
     
-    
-    router.get('/find-transcript', (req, res) => {
-        // Transcript.find({"gender": "female"}).then( result =>  {
-        // Transcript.findById("62c2e247216d43017babdb67").then( result =>  {
-        Transcript.find({"id": 420}).then( result =>  {
-            console.log(result)
-            res.send(result)
-        })
-    })
-    
-    router.get('/null-transcript', (req, res) => {
-        Transcript.find({"gender": "femaleZZZ"}).then( result =>  {
-            console.log(result)
-            if (result) {
-                console.log("not null")
-            }
-            console.log(result.length)
-            res.send(result)
-        })
-    })
-    
-    
-    // var corsOptions = { origin: 'http://localhost:2000' }
-    // router.post('/upload3', cors(corsOptions), (req, res) => {
-        router.post('/upload3', (req, res) => {
-            // res.set('Access-Control-Allow-Origin', '*')
-            console.log("got something zzz");
-            console.log(req.headers)
-            console.log(req.body)
-            i =0;
-            let body = [];
-            req.on("error", err => {
-                console.error(err)
-            }).on('data', chunk => {
-                console.log(`Data chunk available ${i}`);
-                i ++
-                body.push(chunk)
-            })
-            // .on('end'), () => {
-            //     body = Buffer.concat(body).toString();
-            // });
-        
-            res.header('Access-Control-Allow-Origin', "*");
-            res.header('Access-Control-Allow-Methods', "*");
-            res.send("got it")
-        })
-    
-    
-    
-    
+//     res.statusCode = 200;
+//     res.send("GOOD!");
+//     return;
+// })
 
 
-
-
-module.exports = router;
 
 
       
@@ -375,6 +189,30 @@ module.exports = router;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+router.get('/find-transcript', (req, res) => {
+    // Transcript.find({"gender": "female"}).then( result =>  {
+    // Transcript.findById("62c2e247216d43017babdb67").then( result =>  {
+    Transcript.find({"id": 420}).then( result =>  {
+        console.log(result)
+        res.send(result)
+    })
+})
+
+router.get('/null-transcript', (req, res) => {
+    Transcript.find({"gender": "femaleZZZ"}).then( result =>  {
+        console.log(result)
+        if (result) {
+            console.log("not null")
+        }
+        console.log(result.length)
+        res.send(result)
+    })
+})
+
+
+
+
 router.get("/allTsDbFull", async (req, res) => {
 
     let allTrans = await Transcript.find({});
@@ -383,27 +221,27 @@ router.get("/allTsDbFull", async (req, res) => {
     res.json(allTrans)
 })
 
-router.get("/allTranscriptsAAI", async (req, res) => {
-    let qLimit = 69;
-    let qStatus = "completed";
-    let aiUrl = `https://api.assemblyai.com/v2/transcript?limit=${qLimit}&status=${qStatus}`
-    let resMsg = await common.makeHttpRequest(aiUrl, { headers: { Authorization: authoriziation } });
+// router.get("/allTranscriptsAAI", async (req, res) => {
+//     let qLimit = 69;
+//     let qStatus = "completed";
+//     let aiUrl = `https://api.assemblyai.com/v2/transcript?limit=${qLimit}&status=${qStatus}`
+//     let resMsg = await common.makeHttpRequest(aiUrl, { headers: { Authorization: authoriziation } });
 
-    res.statusCode = resMsg.statusCode;
-    resMsg.data['errorMsg'] = resMsg.errorMsg
-    console.log("resMsg.data")
-    console.log("resMsg.data")
-    console.log(resMsg.data)
-    let trimmedRes = resMsg.data.transcripts?.map( ts =>  ts.id )
+//     res.statusCode = resMsg.statusCode;
+//     resMsg.data['errorMsg'] = resMsg.errorMsg
+//     console.log("resMsg.data")
+//     console.log("resMsg.data")
+//     console.log(resMsg.data)
+//     let trimmedRes = resMsg.data.transcripts?.map( ts =>  ts.id )
 
-    if ( resMsg.errorMsg) { 
-        console.log("shiiiit something went wrong: " + resMsg.data['errorMsg'] ) 
-        res.json(resMsg)
-    }
-    res.render("transcripts/allTrans", { allItems: trimmedRes })
-    // res.json(resMsg.data)
+//     if ( resMsg.errorMsg) { 
+//         console.log("something went wrong: " + resMsg.data['errorMsg'] ) 
+//         res.json(resMsg)
+//     }
+//     res.render("transcripts/allTrans", { allItems: trimmedRes })
+//     // res.json(resMsg.data)
+// })
 
-})
 router.get("/allTranscriptsDb", async (req, res) => {
     const filter = {};
     let allTransIds = await Transcript.find(filter, {id: 1, _id: 0});
@@ -418,17 +256,9 @@ const saveToDb = (CollectionName) => {
     const transcript = new CollectionName(data);
     transcript.save().then( (result) => {
         console.log("save success!.")
-        // resMsg = {
-        //     statusCode: 200, 
-        //     data: result
-        // }
     })
     .catch( err => {
         console.log("(My error) Error occured", err)
-        // resMsg = {
-        //     statusCode: 500, 
-        //     errorMsg: "Saving data to mongo failed :( " + err, 
-        // }
     })
 }
 
@@ -450,6 +280,10 @@ router.get('/transcript/:id', async (req, res) => {
 
 
 
+
+
+
+module.exports = router;
 
 
 

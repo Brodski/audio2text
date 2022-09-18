@@ -33,9 +33,9 @@
 <div class="nav_wrap">
     <nav class="container">
         <a href="/">Search</a>
-        <a href="/vods/all">Vods</a>
-        <a href="/editors-choice">Editor's Choice</a>
-        <a href="/honorable-mentions">Honorable Mentions</a>
+        <a href="/vods/all">Vids</a>
+        <%- process.env.SAMPLE_NAV_OFF == 'true' ? '' : `<a href="/editors-choice">Editor's Choice</a>` %>
+        <%- process.env.SAMPLE_NAV_OFF == 'true' ? '' : `<a href="/honorable-mentions">Honorable Mentions</a>` %>
         <%- process.env.DEVPRODLOCAL == 'local' ? '<a href="/test">Test</a>' : '' %>
     </nav>
 </div>

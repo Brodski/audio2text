@@ -2,40 +2,21 @@
 // https://www.hava.io/blog/what-is-aws-elastic-beanstalk
 // After deployment, the operations of your Elastic Beanstalk hosted applications is also easier. You no longer have to take on the role of monitoring servers, monitoring storage, managing network loads, keeping operating systems up to date since this is all taken care of by the platform.
 
-const express = require('express');
 const { default: mongoose } = require('mongoose');
+const express = require('express');
 const app = express()
-const cors = require("cors");
-const blogRoutes = require('./routes/blogRoutes');
-const transcriptRoutes = require('./routes/transcriptRoutes');
-// const testRoutes = require('./routes/testRoutes');
 const myCron = require('./jobs/jobs'); // This calls cron
+const transcriptRoutes = require('./routes/transcriptRoutes');
+
 require("dotenv").config();
 
 
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_USERNAME;
 let dbUri = '';
-if (process.env.SAMPLE_ENV == true) {
-  console.log("IS TRUEEEEEEE")
-  console.log("IS TRUEEEEEEE")
-  console.log("IS TRUEEEEEEE")
-  console.log("IS TRUEEEEEEE")
-}
-if (process.env.SAMPLE_ENV2 == "true") {
-  console.log("IS kek")
-  console.log("IS kek")
-  console.log("IS kek")
-  console.log("IS kek")
-  console.log("IS kek")
-}
 
 // sloppy, should update at some point. (have to update env-variables in Beanstalk)
 if (process.env.SAMPLE_DB_NAME != null ){
-  console.log("Connecting to sample DB")
-  console.log("Connecting to sample DB")
-  console.log("Connecting to sample DB")
-  console.log("Connecting to sample DB")
   console.log("Connecting to sample DB")
   dbUri = `mongodb+srv://${dbUser}:${dbPass}@transcribedb.lu2tf.mongodb.net/${process.env.SAMPLE_DB_NAME}?retryWrites=true&w=majority`
 } else {
@@ -50,7 +31,8 @@ mongoose.connect(dbUri)
     admin.buildInfo(function (err, info) {
        console.log("Mongodb version: ", info.version);
     });
-    app.listen( process.env.PORT || 3000 )
+    // PORT 443 for cloud / beanstalk and such
+    app.listen( process.env.PORT || 3000 ) 
   })
   .catch( err => {
     console.log('Error', err)
@@ -62,28 +44,10 @@ app.set('views', './views') // this line not needed b/c views is by default
 
 app.use(express.static(__dirname + '/public'))
 app.use(express.urlencoded({extended: true}))
-// app.use('/blogs', blogRoutes) // (adds blogs at the start) blog/blogs/create
-
-
-
-// var corsOptions = { origin: 'http://localhost:2000' }
-var corsOptions = { origin: '*' }
-
-// 
-// app.use(cors(corsOptions))
-// app.use(blogRoutes)
 app.use(transcriptRoutes)
-// app.use(testRoutes)
-
-
-// app.options('*', cors(corsOptions));
-
 
 app.get('/', async (req, res) => {
-  // res.send("<p> home </p>") // auto figures out content-type 
-  // res.sendFile('./views/index.html', {root: __dirname });
-  res.render('./transcripts/search', {title : 'Cool Title'});
-
+  res.render('./transcripts/search', {title : 'Search'});
 })
 
 app.get('/test', async (req, res) => {
@@ -93,7 +57,7 @@ app.get('/test', async (req, res) => {
 
 })
 
-//If the other app.get() doesnt hit anything, then it will hit this line. must be at bottom
+// If the other app.get() doesnt hit anything, then it will hit this line. must be at bottom
 app.use((req, res) => {
   res.status(404).sendFile('./views/404.html', {root: __dirname})
 })

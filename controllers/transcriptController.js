@@ -1,12 +1,8 @@
-// const Blog = require('../models/TRASH_blog');
-// const Transcript = require('../models/transcript');
-
 const { Captions } = require('../models/captions');
 const { Clip }  = require('../models/captions');
 
 const common = require('../controllers/common.js');
-const allVids = require("../models/TRASH_allVids");
-const parseString = require('xml2js').parseString;
+// const parseString = require('xml2js').parseString;
 const VidData = require('../models/VidData');
 
 const csv = require("csvtojson");

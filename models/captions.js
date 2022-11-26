@@ -1,15 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
-// const captionsSchema = new Schema(
-//   [{
-//   "Start Time": String,
-//   "End Time": String,
-//   "Transcript": String,
-// } ]
-// )
-
-
 const captionsSchema = new Schema({
   any: Object 
   },  { 

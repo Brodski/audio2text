@@ -4,8 +4,6 @@ const transcriptController = require("../controllers/transcriptController");
 
 require("dotenv").config();
 
-// https://api.assemblyai.com/v2/transcript/ouo2d25wgl-86ae-413c-93e0-ee50863c5545/sentences
-
 router.get("/search", async (req, res) => { res.render("transcripts/search") })
 router.get("/vods/all",  transcriptController.render_all_vods);
 router.get("/vods/:id", transcriptController.get_vod_by_id);

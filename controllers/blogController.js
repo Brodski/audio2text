@@ -1,6 +1,6 @@
 //blog_index blog_details, blog_create_get, blog_create
 
-const Blog = require('../models/blog');
+const Blog = require('../models/TRASH_blog');
 const Transcript = require('../models/transcript');
 
 const blog_index = (req, res) => {
@@ -10,10 +10,8 @@ const blog_index = (req, res) => {
 }
 
 const blog_details = (req, res) => {
-  console.log('req.params', req.params)
   const id = req.params.id
   Blog.findById(id).then( result => {
-    console.log("result", result)
     res.render('blogs/details', {blog: result})
   })
   .catch(err => {
@@ -26,10 +24,8 @@ const blog_create_get = (req, res) => {
 }
 
 const blog_create_post =  (req, res) => {
-  console.log(req.body)
   const blog = new Blog(req.body)
   blog.save().then((result) => {
-    console.log('saved!')
     res.redirect('/blogs')
   })
 }

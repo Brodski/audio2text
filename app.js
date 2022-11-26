@@ -8,7 +8,7 @@ const app = express()
 const cors = require("cors");
 const blogRoutes = require('./routes/blogRoutes');
 const transcriptRoutes = require('./routes/transcriptRoutes');
-const testRoutes = require('./routes/testRoutes');
+// const testRoutes = require('./routes/testRoutes');
 const myCron = require('./jobs/jobs'); // This calls cron
 require("dotenv").config();
 
@@ -71,9 +71,9 @@ var corsOptions = { origin: '*' }
 
 // 
 // app.use(cors(corsOptions))
-app.use(blogRoutes)
+// app.use(blogRoutes)
 app.use(transcriptRoutes)
-app.use(testRoutes)
+// app.use(testRoutes)
 
 
 // app.options('*', cors(corsOptions));

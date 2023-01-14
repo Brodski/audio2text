@@ -5,7 +5,7 @@
 const { default: mongoose } = require('mongoose');
 const express = require('express');
 const app = express()
-const myCron = require('./jobs/jobs'); // This calls cron
+const myCron = require('../gogogo/jobs/jobs'); // This calls cron
 const transcriptRoutes = require('./routes/transcriptRoutes');
 const serverless = require('serverless-http');
 
@@ -45,8 +45,9 @@ app.set('views', './views') // this line not needed b/c views is by default
 
 app.use(express.static(__dirname + '/public'))
 app.use(express.urlencoded({extended: true}))
-app.use(transcriptRoutes)
-// app.use('/.netlify/functions/app', transcriptRoutes)
+
+// app.use(transcriptRoutes) // npm start-reg
+app.use('/.netlify/functions/app.js', transcriptRoutes)
 
 
 
@@ -67,4 +68,4 @@ app.use((req, res) => {
   res.status(404).sendFile('./views/404.html', {root: __dirname})
 })
 
-// module.exports.handler = serverless(app);
+module.exports.handler = serverless(app);

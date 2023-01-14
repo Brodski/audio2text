@@ -1,0 +1,3 @@
+[build]
+    commandzz = "npm isntall && npm run build"
+    functions = "functions"

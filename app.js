@@ -7,7 +7,7 @@ const express = require('express');
 const app = express()
 const myCron = require('./jobs/jobs'); // This calls cron
 const transcriptRoutes = require('./routes/transcriptRoutes');
-const serverless = require('serverless-http');
+// const serverless = require('serverless-http');
 
 require("dotenv").config();
 

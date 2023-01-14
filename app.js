@@ -32,7 +32,7 @@ mongoose.connect(dbUri)
     admin.buildInfo(function (err, info) {
        console.log("Mongodb version: ", info.version);
     });
-    // PORT 443 for cloud / beanstalk and such
+    // PORT 443 for cloud / beanstalk and such.
     app.listen( process.env.PORT || 3000 ) 
   })
   .catch( err => {

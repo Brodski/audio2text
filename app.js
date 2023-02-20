@@ -1,21 +1,31 @@
+// https://stackoverflow.com/questions/46857335/how-to-remove-stage-from-urls-for-aws-lambda-functions-serverless-framework
+
 
 // https://www.hava.io/blog/what-is-aws-elastic-beanstalk
 // After deployment, the operations of your Elastic Beanstalk hosted applications is also easier. You no longer have to take on the role of monitoring servers, monitoring storage, managing network loads, keeping operating systems up to date since this is all taken care of by the platform.
-
+console.log("0 greetingssssssssssssssssssssss")
 const { default: mongoose } = require('mongoose');
+console.log(".1 greetingssssssssssssssssssssss")
 const express = require('express');
+console.log(".2 greetingssssssssssssssssssssss")
 const app = express()
+console.log(".3 greetingssssssssssssssssssssss")
 const myCron = require('./jobs/jobs'); // This calls cron
-const transcriptRoutes = require('./routes/transcriptRoutes');
-// const serverless = require('serverless-http');
 
+console.log(".4 greetingssssssssssssssssssssss")
+const transcriptRoutes = require('./routes/transcriptRoutes');
+console.log("1 greetingssssssssssssssssssssss")
+const serverless = require('serverless-http');
+const path = require("path");
 require("dotenv").config();
+console.log("2 greetingssssssssssssssssssssss")
+const StaticFileHandler = require('serverless-aws-static-file-handler')
 
 
 const dbPass = process.env.DB_PASS;
 const dbUser = process.env.DB_USERNAME;
 let dbUri = '';
-
+console.log("3 greetingssssssssssssssssssssss")
 // sloppy, should update at some point. (have to update env-variables in Beanstalk)
 if (process.env.SAMPLE_DB_NAME != null ){
   console.log("Connecting to sample DB")
@@ -25,6 +35,13 @@ if (process.env.SAMPLE_DB_NAME != null ){
 }
 
 console.log('gonna connect to mongo!')
+console.log('PORT!')
+console.log(process.env.PORT || 3000)
+console.log(process.env.PORT || 3000)
+console.log(process.env.PORT || 3000)
+console.log(process.env.PORT || 3000)
+console.log("serveless env: SUB_ENV " + process.env.SUB_ENV)
+console.log("serveless env: COOL_API_TEST " + process.env.COOL_API_TEST)
 mongoose.connect(dbUri)
   .then((result) => {
     console.log("Connected to mongoose DB, gogoogogoo");
@@ -33,7 +50,7 @@ mongoose.connect(dbUri)
        console.log("Mongodb version: ", info.version);
     });
     // PORT 443 for cloud / beanstalk and such.
-    app.listen( process.env.PORT || 3000 ) 
+    // app.listen( process.env.PORT || 3000 ) 
   })
   .catch( err => {
     console.log('Error', err)
@@ -48,13 +65,32 @@ app.use(express.urlencoded({extended: true}))
 app.use(transcriptRoutes)
 // app.use('/.netlify/functions/app', transcriptRoutes)
 
+const clientFilesPath = path.join(__dirname, "./public/")
+const fileHandler = new StaticFileHandler(clientFilesPath)
+
+
+module.exports.html = async (event, context) => {
+  // event.path = "index.html" // forcing a specific page for this handler, ignore requested path. This would serve ./data-files/index.html
+  return fileHandler.get(event, context)
+}
 
 
 app.get('/', async (req, res) => {
+  console.log("transcripts route")
   res.render('./transcripts/search', {title : 'Search'});
 })
 
 app.get('/test', async (req, res) => {
+  console.log("test page")
+  console.log("test serveless env: SUB_ENV " + process.env.SUB_ENV)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
+  console.log("test serveless env: COOL_API_TEST_2 " + process.env.COOL_API_TEST_2)
   // res.send("<p> home </p>") // auto figures out content-type 
   // res.sendFile('./views/index.html', {root: __dirname });
   res.render('test', {title : 'Cool Title'});
@@ -67,4 +103,6 @@ app.use((req, res) => {
   res.status(404).sendFile('./views/404.html', {root: __dirname})
 })
 
-// module.exports.handler = serverless(app);
+// Credentials are stored in INI format in ~/.aws/credentials
+// C:\Users\DrBrodski\.aws
+module.exports.handler = serverless(app);

@@ -1,0 +1,144 @@
+# For full config options, check the docs:
+#    docs.serverless.com
+
+
+service: nodejsserver
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: '3'
+	
+# Load environment variables from .env files (default: false)
+# See https://www.serverless.com/framework/docs/environment-variables
+useDotenv: true
+
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: dev
+  region: us-east-1
+  environment:
+    COOL_API_TEST: 12345_69 ;)
+    COOL_API_TEST_2: $SERVERLESS_ENV_TEST
+
+functions:
+  hello:
+    handler: handlerxx.hello
+    events:
+      # - http:
+      - httpApi:
+          path: /hi
+          method: GET
+      # - http:
+      #     path: /{any+}
+      #     method: GET
+  hello2:
+    handler: app.handler
+    envrionment:
+      SUB_ENV: bang bang baby
+    events:
+      # - http:
+      - httpApi:
+          path: /
+          method: GET
+      - httpApi:
+          path: /{any+}
+          method: GET
+          #https://stackoverflow.com/questions/46857335/how-to-remove-stage-from-urls-for-aws-lambda-functions-serverless-framework
+  # html:
+  #   handler: app.html
+  #   events:
+  #     # - http:
+  #     - httpApi:
+  #         path: /
+  #         method: get
+# adding these two lines
+# npm install serverless-offline --save-dev
+# run it locally
+# $ serverless
+# $ serverless offline start
+plugins:
+  - serverless-offline
+# NOTE! is IP white-listed
+#https://hackernoon.com/a-crash-course-on-serverless-with-node-js-632b37d58b44#422a
+#    events:
+#      - httpApi:
+#          path: /users/create
+#          method: get
+#      - websocket: $connect
+#      - s3: ${env:BUCKET} whe s3 bucket gets updated
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
+#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+#      - alb:
+#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
+#          priority: 1
+#          conditions:
+#            host: example.com
+#            path: /hello
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+
+
+
+
+
+
+
+
+
+###################
+
+# you can add statements to the Lambda function's IAM Role here
+#  iam:
+#    role:
+#      statements:
+#        - Effect: "Allow"
+#          Action:
+#            - "s3:ListBucket"
+#          Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#        - Effect: "Allow"
+#          Action:
+#            - "s3:PutObject"
+#          Resource:
+#            Fn::Join:
+#              - ""
+#              - - "arn:aws:s3:::"
+#                - "Ref" : "ServerlessDeploymentBucket"
+#                - "/*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+#package:
+#  patterns:
+#    - '!exclude-me.js'
+#    - '!exclude-me-dir/**'
+#    - include-me.js
+#    - include-me-dir/**

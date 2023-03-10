@@ -1,5 +1,8 @@
 # Bski Captions 
-
+  
+- Search transcriptions and then get video with timestamp/clip  
+- I made this to help me learn NodeJS and related tech to it.  
+  
 ### https://bski.one  
 - A NodeJS server utilizing AWS services and a MongoDB Atlas cluster
 - Content is stored in a S3 bucket, contains; many videos and their transcripts with timestamps 

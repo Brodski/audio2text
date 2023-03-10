@@ -1,0 +1,17 @@
+
+DB_PASS="xxxxxxxx"
+DB_USERNAME="user"
+CDN_DOMAIN="https://xxxxxxxxxxx.cloudfront.net" <---- this is cdn over the S3 with transcrips + vids
+DEVPRODLOCAL="local"
+
+# PORT = 8080
+# DRY_RUN = "true" <--- for saving into mongodb
+# SAMPLE_DB_NAME = "sample-transcripts"
+# SAMPLE_NAV_OFF = "true"
+# SAMPLE_VIDPATH = "sample-vids/"
+# SAMPLE_PLACEHOLDER = "eg. Good evening"
+# SAMPLE_TIP1 = "Good evening"
+# SAMPLE_TIP2 = "Joe Biden OR the queen OR Trump"
+# IS_LAMBDA = 
+# DEVPRODLOCAL="local"
+# LAZYAUTH="xxxxxxxxxxxxxx"

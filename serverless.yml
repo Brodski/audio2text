@@ -1,6 +1,9 @@
 # For full config options, check the docs:
 #    docs.serverless.com
 
+# npm i serverless
+# npm i serverless-offline
+
 
 service: nodejsserver
 # app and org for use with dashboard.serverless.com
@@ -13,17 +16,17 @@ frameworkVersion: '3'
 	
 # Load environment variables from .env files (default: false)
 # See https://www.serverless.com/framework/docs/environment-variables
-useDotenv: true
+# useDotenv: true
 
 
 provider:
   name: aws
   runtime: nodejs16.x
-  stage: dev
+  stage: dev3
   region: us-east-1
-  environment:
+  environment: # env https://www.youtube.com/watch?v=1_sOPBgRAww
+    IS_LAMBDA: true
     COOL_API_TEST: 12345_69 ;)
-    COOL_API_TEST_2: $SERVERLESS_ENV_TEST
 
 functions:
   hello:
@@ -38,8 +41,6 @@ functions:
       #     method: GET
   hello2:
     handler: app.handler
-    envrionment:
-      SUB_ENV: bang bang baby
     events:
       # - http:
       - httpApi:
@@ -49,6 +50,12 @@ functions:
           path: /{any+}
           method: GET
           #https://stackoverflow.com/questions/46857335/how-to-remove-stage-from-urls-for-aws-lambda-functions-serverless-framework
+
+  # serve static files: https://www.npmjs.com/package/serverless-aws-static-file-handler
+  # module.exports.html = async (event, context) => {
+  #   // event.path = "index.html" // forcing a specific page for this handler, ignore requested path. This would serve ./data-files/index.html
+  #   return fileHandler.get(event, context)
+  # }
   # html:
   #   handler: app.html
   #   events:
@@ -56,6 +63,9 @@ functions:
   #     - httpApi:
   #         path: /
   #         method: get
+
+
+
 # adding these two lines
 # npm install serverless-offline --save-dev
 # run it locally
@@ -63,6 +73,43 @@ functions:
 # $ serverless offline start
 plugins:
   - serverless-offline
+  # - serverless-domain-manager
+	
+# domain name https://aws.plainenglish.io/serverless-framework-setting-up-a-custom-domain-to-api-gateway-91064a598f1d
+# domain name https://www.serverless.com/plugins/serverless-domain-manager
+# 1 $ serverless create_domain
+# 2 $ serverless deploy
+# (option) $ serverless delete_domain 
+# custom:
+#   customDomain:
+#     domainName: slessrest1.bski.one
+#     # basePath: 'bang'
+#     stage: ${self:provider.stage}
+#     certificateName: '*.bski.one'
+#     createRoute53Record: true
+#     endpointType: 'regional'
+#     apiType: rest
+	
+  # customDomain:
+  #   rest:
+  #     domainName: rest.serverless.foo.com
+  #     stage: ci
+  #     basePath: api
+  #     certificateName: '*.bski.one'
+  #     createRoute53Record: true
+  #     createRoute53IPv6Record: true
+  #     endpointType: 'regional'
+  #     securityPolicy: tls_1_2
+    # http:
+    #   domainName: http.serverless.foo.com
+    #   stage: ci
+    #   basePath: api
+    #   certificateName: '*.foo.com'
+    #   createRoute53Record: true
+    #   createRoute53IPv6Record: true
+    #   endpointType: 'regional'
+    #   securityPolicy: tls_1_2
+
 # NOTE! is IP white-listed
 #https://hackernoon.com/a-crash-course-on-serverless-with-node-js-632b37d58b44#422a
 #    events:

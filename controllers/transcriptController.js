@@ -361,7 +361,8 @@ const saveCaptionsInDb = async (vidDatas) => {
 // in perfect world this (even knowing this entire save function is wack to begin with), we shouldnt have this endpoint even on this server, since that it is publicly accessible
 const updateDbWithS3 = () => {
     return new Promise( async (resolve, reject) => {
-        let url = "https://d2h6hz1aakujaj.cloudfront.net";
+        // let url = "https://d2h6hz1aakujaj.cloudfront.net";
+        let url = process.env.CDN_DOMAIN;
         let request = https.get(url, {headers: "application/xml"} , (response) => {
             let data = ''
             response.on('data', function (chunk) {

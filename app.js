@@ -1,8 +1,8 @@
-// https://stackoverflow.com/questions/46857335/how-to-remove-stage-from-urls-for-aws-lambda-functions-serverless-framework
 
-
-// https://www.hava.io/blog/what-is-aws-elastic-beanstalk
-// After deployment, the operations of your Elastic Beanstalk hosted applications is also easier. You no longer have to take on the role of monitoring servers, monitoring storage, managing network loads, keeping operating systems up to date since this is all taken care of by the platform.
+// After deployment, the operations of your Elastic Beanstalk hosted applications is also easier. 
+// You no longer have to take on the role of monitoring servers, monitoring storage,
+// managing network loads, keeping operating systems up to date since this is all taken 
+// care of by the platform.
 console.log("0 greetingssssssssssssssssssssss")
 const { default: mongoose } = require('mongoose');
 const express = require('express');
@@ -82,8 +82,8 @@ app.get('/test', async (req, res) => {
   res.render('test', {title : 'Cool Title :)'});
 
 })
-// npm i serverless-http
-// npm i netlify-lambda
+
+
 // If the other app.get() doesnt hit anything, then it will hit this line. must be at bottom
 app.use((req, res) => {
   res.status(404).sendFile('./views/404.html', {root: __dirname})
@@ -91,7 +91,8 @@ app.use((req, res) => {
 
 // Credentials are stored in INI format in ~/.aws/credentials
 // C:\Users\DrBrodski\.aws
-console.log("process.env.IS_LAMBDA" , process.env.IS_LAMBDA)
+// process.env.IS_LAMBDA ---> From serverless.yml
+console.log("process.env.IS_LAMBDA" , process.env.IS_LAMBDA) 
 if (process.env.IS_LAMBDA) {
   console.log("process.env.IS_LAMBDA" , process.env.IS_LAMBDA)
   module.exports.handler = serverless(app);

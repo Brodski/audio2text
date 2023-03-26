@@ -36,6 +36,6 @@
         <a href="/vods/all">Vids</a>
         <%- process.env.SAMPLE_NAV_OFF == 'true' ? '' : `<a href="/editors-choice">Editor's Choice</a>` %>
         <%- process.env.SAMPLE_NAV_OFF == 'true' ? '' : `<a href="/honorable-mentions">Honorable Mentions</a>` %>
-        <%- process.env.DEVPRODLOCAL == 'local' ? '<a href="/test">Test</a>' : '' %>
+        <%- process.env.IS_LAMBDA !== 'true' ? '<a href="/test">Test</a>' : '' %>
     </nav>
 </div>

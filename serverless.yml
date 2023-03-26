@@ -24,8 +24,17 @@
 # S3
 # DB: Needs S3 bucket and Cloudfront in front of it.
 # (recommened for style points) CNAME
-
-
+# 
+# Domain Name 
+# Via CloudFront, ontop of for Lambda
+# 1 Create CloudFront distribution
+# 1.1  Protocol - HTTPS
+# 2 Set CF origin. ex) b3j5az6dak.execute-api.us-east-1.amazonaws.com
+# 4 Set "Name" to your domain. ex) sample.bski.one
+# 5 Set "Alternate domain name (CNAME) - optional" to your domain. ex) sample.bski.one
+# 3 Go to Route53 Hosted zones - 
+# 4 Create record
+# 5 Route traffic to the cloudfront ^
 
 # Tutorial Serverless
 # https://hackernoon.com/a-crash-course-on-serverless-with-node-js-632b37d58b44#422a
@@ -128,3 +137,30 @@ plugins:
     #   securityPolicy: tls_1_2
 
 # https://hackernoon.com/a-crash-course-on-serverless-with-node-js-632b37d58b44#422a
+
+
+
+
+
+
+
+
+
+
+
+# This policy works
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": "*",
+#             "Resource": "*",
+#             "Condition": {
+#                 "IpAddress": {
+#                     "aws:SourceIp": "76.130.182.66/32"
+#                 }
+#             }
+#         }
+#     ]
+# }

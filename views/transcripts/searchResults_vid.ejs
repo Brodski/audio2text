@@ -1,12 +1,12 @@
-
 <%# let vidSrc = process.env.CDN_DOMAIN + "/" + vidAndClips.vidPath?.replaceAll(" ", "+").replaceAll("#", "%23") #%>
- <% let vidSrc = process.env.CDN_DOMAIN + "/" + vidAndClips.vidPath?.replaceAll(" ", "+").replaceAll("#", "%23") %>
-<% let vidSrc2 = process.env.CDN_DOMAIN + "/" + encodeURIComponent(vidAndClips.vidPath) %>
-<% let vidSrc3 = process.env.CDN_DOMAIN + "/" + vidAndClips.vidPath?.split('/')[1] %>
+<%# let vidSrc2 = process.env.CDN_DOMAIN + "/" + encodeURIComponent(vidAndClips.vidPath) #%>
+<%# let vidSrc3 = process.env.CDN_DOMAIN + "/" + vidAndClips.vidPath?.split('/')[1] #%>
+<% 
+    let idx = vidAndClips.vidPath?.indexOf("/");
+    let str = (idx !== -1) ? vidAndClips.vidPath.substring(idx) : + "/" + vidAndClips.vidPath;
+    let vidSrc = process.env.CDN_DOMAIN + encodeURI(str) 
+%>
 
-<div> vidSrc0 = <%= vidAndClips.vidPath %>
-<div> vidSrc2 = <%= vidSrc2 %>
-<div> vidSrc3 = <%= vidSrc3 %>
 <div class="searchResults_wrap">
     <div class="searchResults_vid" >
         <div> <b> <%= vidAndClips.vidTitle %> </b></div>
